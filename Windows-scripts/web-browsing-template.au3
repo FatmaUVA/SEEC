@@ -228,8 +228,14 @@ Func AddItemToDic(ByRef $oDictionary)
     $oDictionary.Add ("Youtube.com", "video" )
     $oDictionary.Add ("Facebook.com","social" )
     $oDictionary.Add ("Amazon.com", "shop" )
-	$oDictionary.Add ("Reddit.com","news" )
-	$oDictionary.Add ("Yahoo.com", "search" )
+    $oDictionary.Add ("Reddit.com","news" )
+    $oDictionary.Add ("Yahoo.com", "search" )
+    $oDictionary.Add ("Cnn.com", "news" )
+    $oDictionary.Add ("Breitbart.com", "news" )
+    $oDictionary.Add ("Nytimes.com", "news" )
+    $oDictionary.Add ("Stackoverflow.com", "forum" )
+    $oDictionary.Add ("Quora.com", "forum" )
+    $oDictionary.Add ("Amazonaws.com", "misc" )
 
 	;TODO: add the websites you worked with, I'll add the rest, make sure to type the site exactly as it shown in the website list file
 EndFunc
@@ -324,7 +330,15 @@ Func NewsTest ($webSite, $hWnd, $cate)
    ;task3 click on post item
    Switch $webSite
    Case "Cnn.com"
-	  ClickOnItem($hWnd, 600,700,$cate) ; the x,y are not real just random number, need to change to the actual x,y coord
+	  ClickOnItem($hWnd, 441,192,$cate)
+   Case "Nytimes.com"
+	  ClickOnItem($hWnd, 687,607,$cate)
+   Case "Breitbart.com"
+	  ClickOnItem($hWnd, 719,724,$cate)
+   Case "Quora.com"
+	  ClickOnItem($hWnd, 712,431,$cate)
+   Case "Stackoverflow.com"
+	  ClickOnItem($hWnd, 692,683,$cate)
    EndSwitch
 
 EndFunc
@@ -332,6 +346,13 @@ EndFunc
 Func BankTest ($webSite, $hWnd, $cate)
    ;task2 scroll down
    ScrollDown($cate)
+   
+   Sleep($timeInterval)
+   
+   Switch $webSite
+   Case "Amazonaws.com"
+   	ClickOnItem($nWnd, 286, 681, $cate)
+   EndSwitch
 EndFunc
 
 
