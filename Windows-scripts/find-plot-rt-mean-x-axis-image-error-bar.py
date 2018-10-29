@@ -12,7 +12,7 @@ import math
 #=====================Initialize parameters===============
 #input arguments
 rtt=[0,20,50,100,200]
-loss=[0] #,3,5]
+loss=[0,3,5]
 app="ImageView"
 #total_runs=23
 method=["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
@@ -163,14 +163,13 @@ markers = ['^','s','o','*','x','D','+']
 fig, ax1 = plt.subplots(1)
 ax1.set_xlabel('Number of unique pixels',fontsize=14)
 ax1.set_ylabel(app+' load time (sec)')
+plt.xticks(pixels_count, ('(150x150,\n18K)', '(240x152,\n24K)', '(637x399,\n34K)', '(800x572,\n77K)', '(1024x683,\n66K)','(1350x902,\n563K)'))
 
 for meth in method:
     col_index = 0 #index to assign differnt colors for lines
     for l in loss_uniq:
         temp5 = "rt_"+meth+"_loss_" + str(l) + "_mean"
         error_rt = "rt_"+meth+"_loss_" + str(l) + "_error"
-
-        #ax1.plot(pixels_count,globals()[temp5],color=colors[col_index],marker=markers[col_index],linewidth=2.0,markersize=10,label = meth+', loss = '+str(l)+"%")
         ax1.errorbar(pixels_count,globals()[temp5], yerr=globals()[error_rt],color=colors[col_index] ,linewidth=2.0,marker=markers[col_index],markersize=10,label = meth+', loss = '+str(l)+"%")
         col_index = col_index + 1
 
@@ -183,7 +182,6 @@ for meth in method:
         if meth != "autoit":
             temp6 = "by_"+meth+"_loss_" + str(l) + "_mean"
             error_by = "by_"+meth+"_loss_" + str(l) + "_error"
-#            ax2.plot(pixels_count,globals()[temp6],color=colors[col_index],marker=markers[col_index],linestyle='dashed',linewidth=2.0,markersize=10,label = meth+',bytes, loss = '+str(l)+"%")
             ax2.errorbar(pixels_count,globals()[temp6], yerr=globals()[error_by],color=colors[col_index], linestyle='dashed',linewidth=2.0,marker=markers[col_index],markersize=10,label = meth+',bytes, loss = '+str(l)+"%")
             print(error_by," ",globals()[error_by])
 
