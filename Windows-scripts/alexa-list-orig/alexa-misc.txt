@@ -1,5 +1,10 @@
+Apple.com
+Microsoft.com
+Amazonaws.com
+Zillow.com
 Office.com
 Force.com
+instructure.com
 Yelp.com
 Github.com
 Wikipedia.org
