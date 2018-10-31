@@ -216,8 +216,8 @@ EndFunc
 
 ; Fuction to convert screen coordinates
 Func _ConvertXY(ByRef $Xin, ByRef $Yin)
-     $Xin = Round( ($Xin / 1680) * @DesktopWidth ) ; 1680 is the display resoution of the display where I wrote my code and based on it found the x,y coord
-     $Yin = Round( ($Yin / 1050) * @DesktopHeight )
+     $Xin = Round( ($Xin / 1920) * @DesktopWidth ) ; 1680 is the display resoution of the display where I wrote my code and based on it found the x,y coord
+     $Yin = Round( ($Yin / 1080) * @DesktopHeight )
 EndFunc
 
 
