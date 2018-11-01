@@ -6,6 +6,7 @@
 	RT objective test for web-browsing,
 	This test create one output file per category
 	To use this script you need to change analyze_RT to save output file per category as well
+	This script doesn't find RT to load Chrome, the code for this is commented out
 #ce ----------------------------------------------------------------------------
 
 ; Script Start - Add your code below here
@@ -30,7 +31,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 ; ============================ Parameters initialization ====================
 ; QoS
 Local $aRTT[1] = [0];,50,100];1,2,5,10,50,100] ;,50, 150]
-Local $aLoss[1] = [0];,3,5] ;,0.05,1] ;packet loss rate, unit is %
+Local $aLoss[3] = [0,3,5] ;,0.05,1] ;packet loss rate, unit is %
 Global $appx = "WebBrowsing"
 Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 GLobal $routerIP = "172.28.30.124" ; the ip address of the server acting as router and running packet capture
@@ -43,9 +44,9 @@ Local $clinetIPAddress = "172.28.30.9"
 Global $udpPort = 60000
 Global $no_tasks = 15
 Global $runNo = 1
-Local $no_of_runs = 1
+Local $no_of_runs = 5
 
-Global $aWebsites_cate = [ "chrome","search", "shop", "news", "video", "social", "forum", "misc", "bank"]
+Global $aWebsites_cate = ["shop", "news", "video", "social", "forum", "misc", "bank"] ;, "search"] ;"chrome",
 
 
 ;===============================Start  test =============================
@@ -97,8 +98,6 @@ For $cate in $aWebsites_cate
 	   MsgBox($MB_SYSTEMMODAL, "File", "Does not exist")
 	EndIf
 
-
-
    ;=========================== Start the test for each category =======================
 
    ; Chrome just continue, we had Chrome as category just to be used to create a result file to hold Chrome load time
@@ -125,16 +124,16 @@ For $cate in $aWebsites_cate
 
 			;load the web-browser (Chrome)
 			;log time
-			Local $hTimer = TimerInit() ;begin the timer and store the handler
+			;Local $hTimer = TimerInit() ;begin the timer and store the handler
 			;mark start of task with a udp packet
-			SendPacket("start")
+			;SendPacket("start")
 
 			ShellExecute("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe","","","",@SW_MAXIMIZE)
 			Local $hChrome = WinWaitActive("New Tab - Google Chrome")
 
-			Local $timeDiff = TimerDiff($hTimer)/1000 ; find the time difference from the first call of TImerInit, unit sec
-			SendPacket("end")
-			FileWrite($hFilehandle, $aRTT[0] & " "& $aLoss[0] & " " & $timeDiff & " ")
+			;Local $timeDiff = TimerDiff($hTimer)/1000 ; find the time difference from the first call of TImerInit, unit sec
+			;SendPacket("end")
+			;FileWrite($hFilehandle, $aRTT[0] & " "& $aLoss[0] & " " & $timeDiff & " ")
 
 
 			;loop through the websites in the category
@@ -173,6 +172,7 @@ For $cate in $aWebsites_cate
 
 			   ;task2 based on the website category
 
+			   #comments-start
 			   Switch $cate
 			   Case "search"
 				  SearchTest($aWebSites[$k],$hWnd)
@@ -186,8 +186,8 @@ For $cate in $aWebsites_cate
 				  NewsTest($aWebSites[$k],$hWnd, $cate)
 			   Case "bank" or "misc"
 				  BankTest($aWebSites[$k],$hWnd, $cate)
-
 			   EndSwitch
+			   #comments-end
 
 			   Sleep($timeInterval)
 			   ;close current tab
@@ -319,7 +319,7 @@ Func router_command($cmd, $videoSpeed="slow", $rtt=0, $loss=0, $n=0); cmd: "star
 	  Send($command)
 	  Send("{ENTER}")
 	  Send("{ENTER}")
-	  ;Sleep(40000) ; becaue it takes some time to process and we don't want to overwrite the pcap
+	  Sleep(25000) ; becaue it takes some time to process and we don't want to overwrite the pcap
 
 
 	EndIf
