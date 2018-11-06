@@ -31,7 +31,7 @@ for meth in method:
             temp1 = "rt_"+meth+"_"+str(i)  #name of array created based on parameters (for rt)
             temp2 = "by_"+meth+"_"+str(i) #array for bytes
             #globals will evaluate the array name befor assigning it the values
-            globals()[temp1], globals()[temp2] = np.loadtxt(res_dir +'/' + file_name, delimiter=' ',usecols=(i+2,i+6),unpack=True)
+            globals()[temp1], globals()[temp2] = np.loadtxt(res_dir +'/' + file_name, delimiter=' ',usecols=(i+2,i+8),unpack=True)
 
 # read rtt and loss values and create arrays based on loss values
 #figure out the length of the file, read only one file , other files would have the same length

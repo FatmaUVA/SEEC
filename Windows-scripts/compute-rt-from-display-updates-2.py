@@ -1,6 +1,6 @@
 #This is a python3 code
 #input: dst_IP pcap rtt loss app run_no
-#python3 compute-rt-from-display-updates.py 172.28.30.9 capture-1-slow.pcap 200 10 imgeView 13
+#python3 compute-rt-from-display-updates-2.py 172.28.30.9 capture-1-slow.pcap 200 10 imgeView 13 5
 
 import sys, os
 import numpy as np
@@ -89,12 +89,13 @@ for i in range(0,len(mk_index),2): #step by 2 because the 2nd marker would be th
             sz.append(sz_temp)
             break
 
-'''
     temp_pckts = np.asarray(temp_pckts)
     ts_diff = np.ediff1d(temp_pckts)
     xx="xx-display-" + str(index)
     np.savetxt(xx, ts_diff)
 
+'''
+    #to print statistics about inter-arrival time between packets (between marker packets)
     print("New Task ")
     print("mean = ", np.mean(ts_diff))
     print("sd = ", np.std(ts_diff))

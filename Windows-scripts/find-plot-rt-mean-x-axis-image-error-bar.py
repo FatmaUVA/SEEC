@@ -16,11 +16,11 @@ loss=[0,3,5]
 app="ImageView"
 #total_runs=23
 method=["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
-run_no="3-Pics10"
+run_no="1-Pics13"
 no_tasks=6
 pixels_count = [18675,24639,129190,309237,563443,733950] #no of unique pixels in each image
 pixels_count = [1,2,3,4,5,6]
-#pxels_count = [18675, 24639,41646,129190, 212414, 309237, 389874, 563443, 733950, 1844451]
+xticks_title = ('(150x150,\n18.7K)', '(240x152,\n24.6K)', '(600x376,\n25.5K)', '(800x572,\n60.0K)', '(1000x715,\n92.4K)','(1350x902,\n563.4K)')
 
 res_dir="/home/harlem1/SEEC/Windows-scripts/results"
 plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/new-mean'
@@ -163,7 +163,7 @@ markers = ['^','s','o','*','x','D','+']
 fig, ax1 = plt.subplots(1)
 ax1.set_xlabel('Number of unique pixels',fontsize=14)
 ax1.set_ylabel(app+' load time (sec)')
-plt.xticks(pixels_count, ('(150x150,\n18K)', '(240x152,\n24K)', '(637x399,\n34K)', '(800x572,\n77K)', '(1024x683,\n66K)','(1350x902,\n563K)'))
+plt.xticks(pixels_count, xticks_title)
 
 for meth in method:
     col_index = 0 #index to assign differnt colors for lines
@@ -190,7 +190,7 @@ for meth in method:
 ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.5,1.18))
 ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.5,-0.1))
 
-plt.show()
+#plt.show()
 #save the plot for each image
 plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
 plt.close()

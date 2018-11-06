@@ -1,0 +1,17 @@
+harlem1@router:~/SEEC/Windows-scripts/Pics9$ magick identify *.jpg | grep JPEG | awk '{print $1, $3}'
+1.jpg 150x150
+2.jpg 240x152
+3.jpg 640x427
+4.jpg 800x572
+5.jpg 1024x683
+6.jpg 2048x1365
+harlem1@router:~/SEEC/Windows-scripts/Pics9$ magick identify -verbose -features 1 -moments -unique *.jpg  | grep Colors:
+  Colors: 18675
+  Colors: 24639
+  Colors: 129190
+  Colors: 77635
+  Colors: 66497
+  Colors: 563443
+harlem1@router:~/SEEC/Windows-scripts/Pics9$ ls -sh
+total 1.7M
+ 20K 1.jpg   16K 2.jpg  204K 3.jpg  124K 4.jpg  260K 5.jpg  1.1M 6.jpg

@@ -19,3 +19,12 @@ harlem1@router:~/SEEC/Windows-scripts/Pics8$ magick identify *.jpg | grep JPEG |
 5.jpg 2048x1365
 6.jpg 2048x1365
 x.jpg 2048x1365
+
+harlem1@router:~/SEEC/Windows-scripts/Pics8$ magick identify -verbose -features 1 -moments *.jpg | grep pixels
+  Number pixels: 2795520
+  Number pixels: 2795520
+  Number pixels: 2795520
+  Number pixels: 2795520
+  Number pixels: 2795520
+  Number pixels: 2795520
+  Number pixels: 2795520

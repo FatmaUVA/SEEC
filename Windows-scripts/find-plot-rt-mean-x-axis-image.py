@@ -38,6 +38,8 @@ for meth in method:
             temp2 = "by_"+meth+"_"+str(i) #array for bytes
             #globals will evaluate the array name befor assigning it the values
             globals()[temp1], globals()[temp2] = np.loadtxt(res_dir +'/' + file_name, delimiter=' ',usecols=(i+2,i+8),unpack=True)
+            #change bytes to MB
+            globals()[temp2] = globals()[temp2]/10e6
 
 # read rtt and loss values and create arrays based on loss values
 #figure out the length of the file, read only one file , other files would have the same length
@@ -134,7 +136,7 @@ for meth in method:
 
 #create anothor axis for number of bytes
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-ax2.set_ylabel('Display Update Size (Bytes)')  # we already handled the x-label with ax1
+ax2.set_ylabel('Display Update Size (MBytes)')  # we already handled the x-label with ax1
 for meth in method:
     col_index = 0 #index to assign differnt colors for lines
     for l in loss_uniq:
@@ -149,6 +151,7 @@ ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.2,1.18))
 ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.2,-0.1))
     #save the plot for each image
 plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
+plt.show()
 #plt.close()
 '''        
 #===============================Save Results=========================
