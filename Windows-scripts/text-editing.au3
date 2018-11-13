@@ -38,7 +38,7 @@ Local $timeInterval = 3000 ;30000
 Local $clinetIPAddress = "172.28.30.9"
 Global $udpPort = 60000
 Global $no_tasks = 5
-Global $runNo = "2-Pics12"
+Global $runNo = "1"
 Local $no_of_runs = 1
 
 
@@ -71,10 +71,10 @@ For $n = 1 To $no_of_runs:
 		 Clumsy($hClumsy, "start")
 
 		 ; start packet capture
-		 router_command("start_capture")
+		 ;router_command("start_capture")
 
 		 ;setup UDP socket
-		 SetupUDP($clinetIPAddress, $udpPort)
+		 ;SetupUDP($clinetIPAddress, $udpPort)
 
 		 Sleep($timeInterval)
 
@@ -82,37 +82,69 @@ For $n = 1 To $no_of_runs:
 		 ;log time
 		 ;Local $hTimer = TimerInit() ;begin the timer and store the handler
 		 ;mark start of task with a udp packet
-		 SendPacket("start")
+		 ;SendPacket("start")
 
-		 ;click on the image to load
 		 ShellExecute($pdfDir,"","","",@SW_MAXIMIZE)
+		 $hPdf =WinWaitActive("pdf")
 		 ;Local $timeDiff = TimerDiff($hTimer)/1000 ; find the time difference from the first call of TImerInit, unit sec
-		 SendPacket("end")
+		 ;SendPacket("end")
 
 		 Sleep($timeInterval)
 
 		 ;task2: scroll down
-		 SendPacket("start")
+		 ;SendPacket("start")
 		 Send('{RIGHT}')
-		 SendPacket("end")
+		 ;SendPacket("end")
 
 		 Sleep($timeInterval)
 
-		 ;task2: copy a paragraph
+		 ;task2: select a paragraph
 		 MouseMove(155, 530)
-		 sleep(500)
-		 SendPacket("start")
+		 sleep(1000)
+		 ;SendPacket("start")
 		 MouseClickDrag($MOUSE_CLICK_LEFT, 155, 530, 662, 914, 1)
-		 SendPacket("end")
+		 ;SendPacket("end")
 
 		 Sleep($timeInterval)
 
+		 ;copy the selected paragraph
+		 Send("^c")
+
+		 ;task: close pdf
+		 ;SendPacket("start")
+		 WinClose($hPdf)
+		 ;SendPacket("end")
+
+
+		 Sleep($timeInterval)
+
+		 ;task3: open wordpad
+		 Run("notepad.exe")
+		 ;SendPacket("start")
+		 $hWord = WinWaitActive("Notepad")
+		 ;SendPacket("end")
+
+		 Sleep($timeInterval)
+
+		 ;task4: paste text
+		 ;SendPacket("start")
+		 Send("^v")
+		 ;SendPacket("end")
+
+		 Sleep($timeInterval)
+
+		 ;task: close wordpad
+		 ;SendPacket("start")
+		 WinKill($hWord)
+		 ;SendPacket("end")
+
+		 Sleep($timeInterval)
 
 		 ;stop capture
-		 router_command("stop_capture")
+		 ;router_command("stop_capture")
 
 		 ;analyze results
-		 router_command("analyze_results","",$aRTT[$i], $aLoss[$j],$n) ;$n is the count within one run
+		 ;router_command("analyze_results","",$aRTT[$i], $aLoss[$j],$n) ;$n is the count within one run
 
 		 Clumsy($hClumsy, "stop")
 
