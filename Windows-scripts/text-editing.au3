@@ -25,7 +25,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 ; ============================ Parameters initialization ====================
 ; QoS
 Local $aRTT[1] = [0];,50,100];1,2,5,10,50,100] ;,50, 150]
-Local $aLoss[1] = [0];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
+Local $aLoss[3] = [0,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
 Global $app = "TextEdit"
 Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 local $pdfDir = $logDir & "\pdf1.pdf"
@@ -34,12 +34,12 @@ GLobal $routerIP = "172.28.30.124" ; the ip address of the server acting as rout
 Global $routerIF = "ens160" ; the router interface where the clinet is connected
 GLobal $routerUsr = "harlem1"
 Global $routerPsw = "harlem"
-Local $timeInterval = 3000 ;30000
-Local $clinetIPAddress = "172.28.30.9"
+Local $timeInterval = 20000 ;30000
+Local $clinetIPAddress = "172.28.30.93"
 Global $udpPort = 60000
 Global $no_tasks = 5
 Global $runNo = "1"
-Local $no_of_runs = 1
+Local $no_of_runs = 3
 
 
 
@@ -69,12 +69,13 @@ For $n = 1 To $no_of_runs:
 		 ;configure clumsy
 		 Clumsy($hClumsy, "configure","",$aRTT[$i], $aloss[$j])
 		 Clumsy($hClumsy, "start")
+		 WinSetState($hClumsy, "", @SW_MINIMIZE)
 
 		 ; start packet capture
-		 ;router_command("start_capture")
+		 router_command("start_capture")
 
 		 ;setup UDP socket
-		 ;SetupUDP($clinetIPAddress, $udpPort)
+		 SetupUDP($clinetIPAddress, $udpPort)
 
 		 Sleep($timeInterval)
 
@@ -82,28 +83,27 @@ For $n = 1 To $no_of_runs:
 		 ;log time
 		 ;Local $hTimer = TimerInit() ;begin the timer and store the handler
 		 ;mark start of task with a udp packet
-		 ;SendPacket("start")
-
+		 SendPacket("start")
 		 ShellExecute($pdfDir,"","","",@SW_MAXIMIZE)
 		 $hPdf =WinWaitActive("pdf")
 		 ;Local $timeDiff = TimerDiff($hTimer)/1000 ; find the time difference from the first call of TImerInit, unit sec
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
 		 ;task2: scroll down
-		 ;SendPacket("start")
+		 SendPacket("start")
 		 Send('{RIGHT}')
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
 		 ;task2: select a paragraph
 		 MouseMove(155, 530)
 		 sleep(1000)
-		 ;SendPacket("start")
+		 SendPacket("start")
 		 MouseClickDrag($MOUSE_CLICK_LEFT, 155, 530, 662, 914, 1)
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
@@ -111,40 +111,40 @@ For $n = 1 To $no_of_runs:
 		 Send("^c")
 
 		 ;task: close pdf
-		 ;SendPacket("start")
+		 SendPacket("start")
 		 WinClose($hPdf)
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 
 		 Sleep($timeInterval)
 
 		 ;task3: open wordpad
 		 Run("notepad.exe")
-		 ;SendPacket("start")
+		 SendPacket("start")
 		 $hWord = WinWaitActive("Notepad")
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
 		 ;task4: paste text
-		 ;SendPacket("start")
+		 SendPacket("start")
 		 Send("^v")
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
 		 ;task: close wordpad
-		 ;SendPacket("start")
+		 SendPacket("start")
 		 WinKill($hWord)
-		 ;SendPacket("end")
+		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
 		 ;stop capture
-		 ;router_command("stop_capture")
+		 router_command("stop_capture")
 
 		 ;analyze results
-		 ;router_command("analyze_results","",$aRTT[$i], $aLoss[$j],$n) ;$n is the count within one run
+		 router_command("analyze_results","",$aRTT[$i], $aLoss[$j],$n) ;$n is the count within one run
 
 		 Clumsy($hClumsy, "stop")
 
