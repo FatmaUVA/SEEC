@@ -15,8 +15,8 @@ rtt=[0,20,50,100,200]
 loss=[0,3,5]
 app="ImageView"
 #total_runs=23
-method=["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
-run_no="1-Pics13"
+method=["autoit"] #["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
+run_no="1-Pics13-model1"
 no_tasks=6
 pixels_count = [18675,24639,129190,309237,563443,733950] #no of unique pixels in each image
 pixels_count = [1,2,3,4,5,6]
@@ -188,7 +188,8 @@ for meth in method:
         col_index = col_index + 1
 
 ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.5,1.18))
-ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.5,-0.1))
+if meth != "autoit":
+    ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.5,-0.1))
 
 #plt.show()
 #save the plot for each image
