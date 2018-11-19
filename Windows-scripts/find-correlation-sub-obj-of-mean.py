@@ -1,6 +1,8 @@
 #This script first read the result files, then create an output in the required format for correlation
-#It consider all observations (runs) it will not take the MOS value
-#Note that the observations of Objective and subjectuve should be the same
+
+#plot mean of RT
+#x-axis is the loss rate, left y-axis RT, rigth y-axis MBytes
+#two lines: 1) RT to load the image, 2) RT to explore the 360 image (drag and drop mouse action)
 
 import sys, os
 import numpy as np
@@ -46,12 +48,15 @@ rtt_unique = np.unique(rtt)
 
 #find indices where loss value equal to specific value and RTT of 0
 rtt_0 = np.where(rtt==0)
+print("rtt_0 ", rtt_0)
 
 for l in loss_uniq:
     temp1 = "loss_" + str(l)
     x = np.where(loss==l)
     globals()[temp1] = np.intersect1d(x,rtt_0)
     total_runs=len(globals()[temp1])
+    print("total_runs_",total_runs)
+    #print("indices, " ,temp1,"  = ",globals()[temp1]) 
     #convert it to a list structure to easily access elemts in a loop
     temp2 = "loss_" + str(l) + "_index"
     globals()[temp2] = []
@@ -77,14 +82,20 @@ for meth in method:
         for i in globals()[temp2]:
             globals()[rt_loss].append(globals()[rt_meth][i])
 
+#for plotting, find geometric mean of each run, then find arthimetic mean of geo-mean, then append to array
 #find geo-mean of each run, then find arithmetic mean of geo-mean
+#create empty arrays to hold geo-mean
 for meth in method:
+    rt_amean = "rt_"+meth +"_amean" #arithmetic mean for the 3 loss values
+    globals()[rt_amean] = [] #array to hold arthimetic mean for all loss values
     for l in loss_uniq:
         rt_loss = "rt_"+meth+"_loss_" + str(l)
         rt_loss_gmean = "rt_"+meth+"_loss_" + str(l) + "_geomean"
         globals()[rt_loss_gmean] = scipy.stats.mstats.gmean(globals()[rt_loss], axis=1)
+        #add it to the arithmetic meean array
+        globals()[rt_amean].append(np.mean(globals()[rt_loss_gmean]))
 
-        print("length of ",rt_loss_gmean," ",len(globals()[rt_loss_gmean]))
+    print(rt_amean, " ", globals()[rt_amean])
 
 #===============prepare subjective results============
 app="ImageView-pics2"
@@ -96,8 +107,9 @@ globals()[data_app] = np.genfromtxt(res_dir+"/merged-"+app+"-QoE-results-"+run_n
 #seperate by app and packet loss rate. rtt is always 0 so don't worry about it
 #also have another array based on app only, each array in the array have all the values for one of the loss values
 data_app = "data_"+app
-sub_loss_all = "sub_"+ app + "_loss_all"
-globals()[sub_loss_all] = []
+app_loss_all = app + "_loss_all"
+app_mean = app + "_mean"
+globals()[app_mean] = []
 
 for l in loss_uniq:
     #create array based on app and loss value to hold QoS
@@ -105,33 +117,17 @@ for l in loss_uniq:
     globals()[app_loss] = []
     #read rows with specific loss value colunm 2 is loss value
     temp = globals()[data_app][np.where(globals()[data_app][:,2] == l)]
-    globals()[app_loss] = temp[:,3]
-    globals()[sub_loss_all].append(globals()[app_loss])
-    no_samples = len(globals()[app_loss])
-
-globals()[sub_loss_all] = np.asarray(globals()[sub_loss_all])
-globals()[sub_loss_all] = np.ndarray.flatten(globals()[sub_loss_all]).astype(np.float)
-#globals()[sub_loss_all] = globals()[sub_loss_all].tolist()
-print("length ",sub_loss_all, " " , globals()[sub_loss_all])
-
-
-#======================== Create final arrays with all observations based on sample size ===========
-obj_loss_all = "obj_"+app + "_loss_all"
-globals()[obj_loss_all] = []
-for meth in method:
-    for l in loss_uniq:
-        rt_loss_gmean = "rt_"+meth+"_loss_" + str(l) + "_geomean"
-        globals()[obj_loss_all].append(globals()[rt_loss_gmean][range(no_samples)])
-        print("length ",obj_loss_all,len(globals()[obj_loss_all]))
-
-    #flatten the array
-    globals()[obj_loss_all] = np.asarray(globals()[obj_loss_all])
-    globals()[obj_loss_all] = np.ndarray.flatten(globals()[obj_loss_all]).astype(np.float)
-#    globals()[obj_loss_all] = globals()[obj_loss_all].tolist()
-    print("length ",obj_loss_all, " " , globals()[obj_loss_all])
+    globals()[app_mean].append(np.mean(temp[:,3]))
+print(app_mean," ",globals()[app_mean])
 
 #======================== find correlation=========================
 
-#coef = scipy.stats.pearsonr(obj_loss_all, sub_loss_all)
-coef = np.corrcoef(obj_loss_all, sub_loss_all)
+rt_amean = "rt_"+meth +"_amean"
+app_mean = app + "_mean"
+
+obj = globals()[rt_amean]
+sub = globals()[app_mean]
+
+coef = scipy.stats.pearsonr(obj, sub)
+
 print("coef = ",coef)
