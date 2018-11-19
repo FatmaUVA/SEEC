@@ -3,7 +3,7 @@
  AutoIt Version: 3.3.14.5
  Author:         Fatma Alali
  Script Function:
-	RT objective test for 360 image view
+	RT objective test for 360 image view, includes 4 tasks, load, move (drag and drop), zoom-n, and zoom-out, repeats the same four tasks for xx images
 #ce ----------------------------------------------------------------------------
 
 ; Script Start - Add your code below here
@@ -29,7 +29,6 @@ Local $aRTT[1] = [0];,50,100];1,2,5,10,50,100] ;,50, 150]
 Local $aLoss[3] = [0,3,5];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
 Global $app = "Insta360"
 Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
-local $picsDir = $logDir & "\Pics12\"
 
 GLobal $routerIP = "172.28.30.124" ; the ip address of the server acting as router and running packet capture
 Global $routerIF = "ens160" ; the router interface where the clinet is connected
@@ -37,11 +36,11 @@ GLobal $routerUsr = "harlem1"
 Global $routerPsw = "harlem"
 Local $timeInterval = 20000 ;30000
 
-Local $clinetIPAddress = "172.28.30.9"
+Local $clinetIPAddress = "172.28.30.9" ;.9 for Wyse 5030 and .93 fro Chromebook
 Global $udpPort = 60000
-Global $no_tasks = 6
-Global $runNo = "2"
-Local $no_of_runs = 10
+Global $no_tasks = 4
+Global $runNo = "1-model4"
+Local $no_of_runs = 30
 
 Local $appName  = "C:\Program Files (x86)\Insta360 Player\Insta360Player.exe"
 Local $winTitle = "Insta360Player"
@@ -75,8 +74,6 @@ $hApp = WinWaitActive($winTitle)
 ;maximizing the window is not working, so I'm doing it manually
 WinMove($hApp,"",0,0,@DesktopWidth, @DesktopHeight)
 
-;For $i = 0 To UBound($aRTT) - 1
-;   For $j = 0 To UBound($aLoss) - 1
 
 For $n = 1 To $no_of_runs:
    For $j = 0 To UBound($aLoss) - 1
@@ -93,29 +90,45 @@ For $n = 1 To $no_of_runs:
 
 		 Sleep($timeInterval)
 
-		 ;load the first image
+		 ;Open the first image
 		 ;click on File
 		 MouseClick("left", 197,38)
 		 Sleep(500)
 		 ;click on Open
 		 MouseClick("left", 199,75)
-		 Sleep(500)
+		 Sleep(1000)
 
 		 ;log time
 		 ;Local $hTimer = TimerInit() ;begin the timer and store the handler
 		 ;mark start of task with a udp packet
 		 SendPacket("start")
 
-		 ;click on the image to load
-		 MouseClick("left", 549,199,2)
+		 ;task1: click on the image to load
+		 ;MouseClick("left", 549,199,2)
+		 ;MouseClick("left", 1381,532,2); for Wyse 5030
+		 MouseClick("left", 1383,264,2) ; for Chromebook
 		 ;Local $timeDiff = TimerDiff($hTimer)/1000 ; find the time difference from the first call of TImerInit, unit sec
 		 SendPacket("end")
 
 		 Sleep($timeInterval)
 
-		 ;click and drag
-		  SendPacket("start")
+		 ;task2: click and drag
+		 SendPacket("start")
 		 MouseClickDrag($MOUSE_CLICK_LEFT, 1386, 497, 884, 497, 5)
+		 SendPacket("end")
+
+		 Sleep($timeInterval)
+
+		 ;task3: zoom-in
+		 SendPacket("start")
+		 MouseWheel($MOUSE_WHEEL_UP, 10)
+		 SendPacket("end")
+
+		 Sleep($timeInterval)
+
+		 ;task4: zoom-out
+		 SendPacket("start")
+		 MouseWheel($MOUSE_WHEEL_DOWN, 10)
 		 SendPacket("end")
 
 		 Sleep($timeInterval)
@@ -141,7 +154,21 @@ For $n = 1 To $no_of_runs:
 
 			;click and drag
 			 SendPacket("start")
-			MouseClickDrag($MOUSE_CLICK_LEFT, 1386, 497, 884, 497, 0) ;1 means drag the with the fastest possible value
+			MouseClickDrag($MOUSE_CLICK_LEFT, 1386, 497, 540, 497, 0) ;1 means drag the with the fastest possible value,  1386, 497, 884, 497, 0
+			SendPacket("end")
+
+			Sleep($timeInterval)
+
+			;task3: zoom-in
+			SendPacket("start")
+			MouseWheel($MOUSE_WHEEL_UP, 10)
+			SendPacket("end")
+
+			Sleep($timeInterval)
+
+			;task4: zoom-out
+			SendPacket("start")
+			MouseWheel($MOUSE_WHEEL_DOWN, 10)
 			SendPacket("end")
 
 			Sleep($timeInterval)
@@ -260,9 +287,12 @@ Func router_command($cmd, $videoSpeed="slow", $rtt=0, $loss=0,$n=0); cmd: "start
 	  Send("{ENTER}")
 
 	  ElseIf $cmd = "analyze_results" Then
-	  $command = "sh SEEC/Windows-scripts/analyze_RT.sh  " & $clinetIPAddress & " " & $rtt & " " & $loss & " " & $no_tasks & " " & $app & " " & $runNo  & " " & $n
+	  $command = "nohup sh SEEC/Windows-scripts/analyze_RT.sh  " & $clinetIPAddress & " " & $rtt & " " & $loss & " " & $no_tasks & " " & $app & " " & $runNo & " " & $n & " & disown" ;I'm using nohup & disown so that the process is not killed when autoit quit the terminal
+	  ;$command = "sh SEEC/Windows-scripts/analyze_RT.sh  " & $clinetIPAddress & " " & $rtt & " " & $loss & " " & $no_tasks & " " & $app & " " & $runNo  & " " & $n
 	  Send($command)
 	  Send("{ENTER}")
+	  Send("{ENTER}")
+	  Sleep(20000)
 
 
 	EndIf
