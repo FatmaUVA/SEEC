@@ -72,7 +72,8 @@ For $n = 1 To $no_of_runs:
 		 OpenTerminal()
 		 Sleep(500)
 		 ;run audio playing script
-		 Send()
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\play-audio.au3"
+		 Send($cmd)
 		 Send("{ENTER}")
 		 WinClose($hRec)
 
@@ -84,7 +85,8 @@ For $n = 1 To $no_of_runs:
 		 OpenTerminal()
 		 ;run recording script
 		 Sleep(500)
-		 Send()
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\$cmd = CUsersfha6npDesktopSEECWindows-scriptsSkype.au3")
+		 Send($cmd)
 		 Send("{ENTER}")
 
 		 WinClose($hCall)
@@ -189,7 +191,7 @@ EndFunc
 Func OpenTerminal()
    MouseClick("left",36,970,1)
    Sleep(500)
-   Send("command prompt")
+   Send("cmd")
    Send("{ENTER}")
    Sleep(5000)
 EndFunc
