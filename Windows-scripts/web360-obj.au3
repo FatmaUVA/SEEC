@@ -27,7 +27,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 ; ============================ Parameters initialization ====================
 ; QoS
 Local $aRTT[1] = [0];,50,100];1,2,5,10,50,100] ;,50, 150]
-Local $aLoss[1] = [0] ;,3,5];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
+Local $aLoss[5] = [0,0.5,3,5,10];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
 Global $app = "Web360"
 Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 
@@ -35,17 +35,17 @@ GLobal $routerIP = "172.28.30.124" ; the ip address of the server acting as rout
 Global $routerIF = "ens160" ; the router interface where the clinet is connected
 GLobal $routerUsr = "harlem1"
 Global $routerPsw = "harlem"
-Local $timeInterval = 20000 ;30000
+Local $timeInterval = 40000 ;30000
 
-Local $clinetIPAddress = "172.28.30.9" ;.9 for Wyse 5030 and .93 for Chromebook
+Local $clinetIPAddress = "172.28.30.22" ;.9 for Wyse 5030 and 22 for Chromebook
 Global $udpPort = 60000
-Global $runNo = "1-model4"
-Local $no_of_runs = 15
+Global $runNo = "3-model3"
+Local $no_of_runs = 20
 
 Local $appName  = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
 Local $winTitle = "New Tab - Google Chrome"
 
-Local $imageURL[5] = ["https://bit.ly/2zlV4xZ", "https://bit.ly/2Sf6nim", "https://bit.ly/2A7Xno2" , "https://bit.ly/2KztFwP", "https://bit.ly/2DzAtJo"]
+Local $imageURL[3] = ["https://bit.ly/2zlV4xZ", "https://bit.ly/2Sf6nim", "https://bit.ly/2A7Xno2"] ; , "https://bit.ly/2KztFwP", "https://bit.ly/2DzAtJo"]
 Global $no_tasks =  UBound($imageURL)
 
 
@@ -81,13 +81,14 @@ $hApp = WinWaitActive($winTitle)
 ;WinMove($hApp,"",0,0,@DesktopWidth, @DesktopHeight)
 
 
-For $n = 1 To $no_of_runs:
+;For $n = 1 To $no_of_runs:
    For $j = 0 To UBound($aLoss) - 1
 	  For $i = 0 To UBound($aRTT) - 1
 		 ;configure clumsy
 		 Clumsy($hClumsy, "configure","",$aRTT[$i], $aloss[$j])
 		 Clumsy($hClumsy, "start")
 
+		 For $n = 1 To $no_of_runs:
 		 ; start packet capture
 		 router_command("start_capture")
 
@@ -111,12 +112,23 @@ For $n = 1 To $no_of_runs:
 			Send('{ENTER}')
 			WinWaitActive("rodedwards")
 
-			;stop auto movement and sound
-			MouseClick("left",835,310)
-			Sleep(500)
-			MouseClick("left",872,972)
-			Sleep(500)
-			MouseClick("left",932,972)
+			If StringInStr ($runNo, "model3" ) Then; model3 display dimenstion is slightly different
+			   ;stop auto movement and sound
+			   MouseClick("left",700,400)
+			   Sleep(500)
+			   MouseClick("left",715,659)
+			   Sleep(500)
+			   MouseClick("left",775,659)
+
+			Else
+			   ;stop auto movement and sound
+			   MouseClick("left",835,310)
+			   Sleep(500)
+			   MouseClick("left",872,972)
+			   Sleep(500)
+			   MouseClick("left",932,972)
+			EndIf
+
 
 
 			;task1: click and drag
