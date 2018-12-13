@@ -27,7 +27,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 ; ============================ Parameters initialization ====================
 ; QoS
 Local $aRTT[1] = [0];,50,100];1,2,5,10,50,100] ;,50, 150]
-Local $aLoss[1] = [0] ;,3,5];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
+Local $aLoss[1] = [33] ;,3,5];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
 Global $app = "Skype"
 Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 
@@ -85,7 +85,7 @@ For $n = 1 To $no_of_runs:
 		 OpenTerminal()
 		 ;run recording script
 		 Sleep(500)
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\$cmd = CUsersfha6npDesktopSEECWindows-scriptsSkype.au3")
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 " & $aLoss[$j])
 		 Send($cmd)
 		 Send("{ENTER}")
 
