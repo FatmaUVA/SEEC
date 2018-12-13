@@ -50,7 +50,7 @@ EndIf
 
 start_record()
 
-If $loss != 0 Then
+If $loss <> 0 Then
 	;parse results and compute PESQ
 	parse()
 
