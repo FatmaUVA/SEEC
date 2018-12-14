@@ -61,7 +61,7 @@ EndIf
 Func start_record()
 	ShellExecute($appName)
 	$hApp = WinWaitActive($winTitle)
-	Sleep(1000)
+	Sleep(2000)
 	;start recording
 	Send("+R") ; Shift(+) and R to start recording in audacity
 	Sleep($audio_len)
