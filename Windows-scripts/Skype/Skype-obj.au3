@@ -75,6 +75,7 @@ For $n = 1 To $no_of_runs:
 		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\play-audio.au3"
 		 Send($cmd)
 		 Send("{ENTER}")
+		 Sleep(3000)
 		 WinClose($hRec)
 
 		 ;========run playing audio script at caller PC
@@ -85,75 +86,12 @@ For $n = 1 To $no_of_runs:
 		 OpenTerminal()
 		 ;run recording script
 		 Sleep(500)
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 " & $aLoss[$j])
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 " & $aLoss[$j]
 		 Send($cmd)
 		 Send("{ENTER}")
-
+		 Sleep(3000)
 		 WinClose($hCall)
 
-		 ;sleep  til the audio finish playing
-		 Sleep(1000)
-
-		 ;=======stop recording and run export script
-
-		 ;parse results and write results to file
-
-		 #comments-start
-		 ; start packet capture
-		 router_command("start_capture")
-
-		 ;setup UDP socket
-		 SetupUDP($clinetIPAddress, $udpPort)
-
-		 Sleep($timeInterval)
-
-		 ;loop through all images
-		 For $k = 0 To UBound($imageURL) - 1
-
-			;activate app window
-			WinActivate($hApp)
-
-			;open new tab in the web browser
-			Send("^t")
-			Sleep(500)
-
-			;visit the image URL
-			Send($imageURL[$k])
-			Send('{ENTER}')
-			WinWaitActive("rodedwards")
-
-			;stop auto movement and sound
-			MouseClick("left",835,310)
-			Sleep(500)
-			MouseClick("left",872,972)
-			Sleep(500)
-			MouseClick("left",932,972)
-
-
-			;task1: click and drag
-			SendPacket("start")
-			MouseClickDrag($MOUSE_CLICK_LEFT, 1386, 497, 884, 497, 1) ;x1,y1,x2,y2,speed(1 fastest, 100 slowest)
-			SendPacket("end")
-
-			Sleep($timeInterval)
-
-			;task2: zoom-in
-			SendPacket("start")
-			MouseWheel($MOUSE_WHEEL_UP, 20)
-			SendPacket("end")
-
-			Sleep($timeInterval)
-
-			;task3: zoom-out
-			SendPacket("start")
-			MouseWheel($MOUSE_WHEEL_DOWN, 20)
-			SendPacket("end")
-
-			Sleep($timeInterval)
-
-			;close current tab
-			Send("^w")
-			#comments-end
 		 Clumsy($hClumsy, "stop")
 
 	  Next
@@ -161,8 +99,6 @@ For $n = 1 To $no_of_runs:
 Next
 
 WinClose($hClumsy)
-WinClose($hRec)
-WinClose($hCall)
 
 
 Func RDP()
@@ -194,117 +130,6 @@ Func OpenTerminal()
    Send("cmd")
    Send("{ENTER}")
    Sleep(500)
-EndFunc
-
-
-Func SetupUDP($sIPAddress, $iPort)
-	UDPStartup() ; Start the UDP service.
-
-    ; Register OnAutoItExit to be called when the script is closed.
-    OnAutoItExitRegister("OnAutoItExit")
-
-	; Assign a Local variable the socket and connect to a listening socket with the IP Address and Port specified.
-    Global $iSocket = UDPOpen($sIPAddress, $iPort,1); 1 flag indicates broadcast, because at the zero clinet we cannot run a UDP server
-    Local $iError = 0
-
-    ; If an error occurred display the error code and return False.
-    If @error Then
-        ; The server is probably offline/port is not opened on the server.
-        $iError = @error
-        MsgBox(BitOR($MB_SYSTEMMODAL, $MB_ICONHAND), "", "Client:" & @CRLF & "Could not connect, Error code: " & $iError)
-        Return False
-    EndIf
-
-
-    ; Close the socket.
-    ;UDPCloseSocket($iSocket)
-EndFunc   ;==>MyUDP_Client
-
-Func OnAutoItExit()
-    UDPShutdown() ; Close the UDP service.
-EndFunc   ;==>OnAutoItExit
-
-
-Func SendPacket($msg)
-	    ; Send the string "toto" converted to binary to the server.
-    UDPSend($iSocket, StringToBinary($msg))
-
-    ; If an error occurred display the error code and return False.
-    If @error Then
-        $iError = @error
-        MsgBox(BitOR($MB_SYSTEMMODAL, $MB_ICONHAND), "", "Client:" & @CRLF & "Could not send the data, Error code: " & $iError)
-        Return False
-    EndIf
-EndFunc
-
-
-Func router_command($cmd, $videoSpeed="slow", $rtt=0, $loss=0,$n=0); cmd: "start_capture", "stop_capture", "analyze"
-
-	; open putty
-	ShellExecute("C:\Program Files\PuTTY\putty")
-	;ShellExecute($videoDir & $vdieoName)
-	Local $hPutty = WinWaitActive("PuTTY Configuration")
-
-	;connect to the router linux server
-	;Send($routerIP)
-	ControlSend("","","",$routerIP)
-	ControlClick($hPutty, "","Button1", "left", 1,8,8)
-
-	Local $hShell = WinWaitActive($routerIP & " - PuTTY")
-	Sleep(500)
-	Send($routerUsr)
-	Send("{ENTER}")
-	Send($routerPsw)
-	Send("{ENTER}")
-	Sleep(500)
-
-	If $cmd = "start_capture" Then
-
-	  ;run the capture /home/fatma/SEEC/Windows-scripts
-	  Local $command = "sudo sh /home/harlem1/SEEC/Windows-scripts/start-tcpdump.sh " & $routerIF & " " & $videoSpeed
-	  Send($command)
-	  Send("{ENTER}")
-	  Sleep(500)
-	  Send($routerPsw)
-	  Send("{ENTER}")
-
-	ElseIf $cmd = "stop_capture" Then
-	  $command = "sudo killall tcpdump"
-	  Send($command)
-	  Send("{ENTER}")
-	  Sleep(500)
-	  Send($routerPsw)
-	  Send("{ENTER}")
-
-	ElseIf $cmd = "analyze" Then
-	  $command = "sudo bash SEEC/Windows-scripts/analyze.sh " & $slow_time & " " & $reg_time & " " & $rtt & " " & $loss
-	  Send($command)
-	  Send("{ENTER}")
-	  Sleep(300)
-	  Send($routerPsw)
-	  Send("{ENTER}")
-
-	  ElseIf $cmd = "compute_plot" Then
-	  $command = "sh SEEC/Windows-scripts/compute-thru.sh  capture-1-slow.pcap "  & $clinetIPAddress & " " & $rtt & " " & $loss
-	  Send($command)
-	  Send("{ENTER}")
-
-	  ElseIf $cmd = "analyze_results" Then
-	  $command = "nohup sh SEEC/Windows-scripts/analyze_RT.sh  " & $clinetIPAddress & " " & $rtt & " " & $loss & " " & $no_tasks & " " & $app & " " & $runNo & " " & $n & " & disown" ;I'm using nohup & disown so that the process is not killed when autoit quit the terminal
-	  ;$command = "sh SEEC/Windows-scripts/analyze_RT.sh  " & $clinetIPAddress & " " & $rtt & " " & $loss & " " & $no_tasks & " " & $app & " " & $runNo  & " " & $n
-	  Send($command)
-	  Send("{ENTER}")
-	  Send("{ENTER}")
-	  Sleep(20000)
-
-
-	EndIf
-
-	;close putty
-	Sleep(500)
-	Send("exit")
-	Send("{ENTER}")
-
 EndFunc
 
 Func Clumsy($hWnd, $cmd, $clinetIPAddress="0.0.0.0", $RTT=0, $loss=0)
