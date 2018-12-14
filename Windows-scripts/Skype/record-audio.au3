@@ -26,12 +26,13 @@ Local $appName  = "C:\Program Files (x86)\Audacity\audacity.exe"
 Local $winTitle = "Audacity"
 Local $audio_len = 5000;in ms
 ;Local $task = "start" ;$CmdLine[1]
-Global $loss = "00" ;$CmdLine[2]
+Global $loss = "3" ;$CmdLine[2]
 Global $hApp =""
 Global $app = "Skype"
 Global $runNo = "3-model3"
 Local $logDir = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype"
 
+#comments-start
 ;============================= Create a file for results======================
 ; Create file in same folder as script
 Global $sFileName = $logDir &"\" & $app &"_PESQ_run_"& $runNo  ;".txt"
@@ -45,6 +46,7 @@ If FileExists($sFileName) Then
 Else
     MsgBox($MB_SYSTEMMODAL, "File", "Does not exist")
 EndIf
+#comments-end
 
 ;============================ start recording=====================
 
@@ -52,9 +54,8 @@ start_record()
 
 If $loss <> 0 Then
 	;parse results and compute PESQ
-	parse()
-
-
+	parse($loss)
+EndIf
 
 
 Func start_record()
@@ -76,7 +77,21 @@ Func start_record()
 
 EndFunc
 
-Func parse()
+Func parse($loss)
+	OpenTerminal()
+	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\loss-0.wav  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
+	Send($cmd)
+	Send("{ENTER}")
+	Sleep(500)
+	WinClose("cmd")
+EndFunc
+
+Func OpenTerminal()
+   MouseClick("left",25,1030,1)
+   Sleep(500)
+   Send("cmd")
+   Send("{ENTER}")
+   Sleep(500)
 EndFunc
 
 

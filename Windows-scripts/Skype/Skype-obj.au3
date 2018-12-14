@@ -193,7 +193,7 @@ Func OpenTerminal()
    Sleep(500)
    Send("cmd")
    Send("{ENTER}")
-   Sleep(5000)
+   Sleep(500)
 EndFunc
 
 
