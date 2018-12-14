@@ -26,7 +26,7 @@ Local $appName  = "C:\Program Files (x86)\Audacity\audacity.exe"
 Local $winTitle = "Audacity"
 Local $audio_len = 5000;in ms
 Local $task = $CmdLine[1]
-Global $loss = "3" ;$CmdLine[2]
+Global $loss = $CmdLine[2]
 Global $hApp =""
 Global $app = "Skype"
 Global $runNo = "3-model3"
@@ -54,12 +54,10 @@ If $task == "start" Then
    start_record()
 ElseIf $task == "stop" Then
    Stop_record()
-EndIf
-
-
-If $loss <> 0 Then
-	;parse results and compute PESQ
-	parse($loss)
+   If $loss <> 0 Then
+		;parse results and compute PESQ
+		parse($loss)
+	EndIf
 EndIf
 
 
@@ -83,8 +81,12 @@ Func stop_record()
 	Sleep(600)
 	;type file name
 	Send("loss-" & $loss)
+	Sleep(1000)
 	Send("{ENTER}")
 	Send("{ENTER}")
+	Send("{ENTER}")
+	Sleep(2000)
+	WinKill($winTitle)
 
 EndFunc
 
