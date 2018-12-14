@@ -68,11 +68,11 @@ For $n = 1 To $no_of_runs:
 		 $hRec = RDP()
 		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 		 ;open command prompt in Caller PC
-		 Sleep(1000)
+		 Sleep(1500)
 		 OpenTerminal()
-		 Sleep(500)
-		 ;run audio playing script
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\play-audio.au3"
+		 Sleep(1000)
+		 ;run recording script
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 start " & $aLoss[$j]
 		 Send($cmd)
 		 Send("{ENTER}")
 		 Sleep(3000)
@@ -82,15 +82,29 @@ For $n = 1 To $no_of_runs:
 		 $hCall = RDP()
 		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 		 ;open command prompt in Recorder PC
-		 Sleep(1000)
+		 Sleep(1500)
 		 OpenTerminal()
 		 ;run recording script
-		 Sleep(500)
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 " & $aLoss[$j]
+		 Sleep(1000)
+		 ;run audio playing script
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\play-audio.au3"
 		 Send($cmd)
 		 Send("{ENTER}")
-		 Sleep(3000)
 		 WinClose($hCall)
+
+		 ;==========run stop recording script at recording PC
+		 $hRec = RDP()
+		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
+		 ;open command prompt in Caller PC
+		 Sleep(1500)
+		 OpenTerminal()
+		 Sleep(1000)
+		 ;run recording script
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 stop " & $aLoss[$j]
+		 Send($cmd)
+		 Send("{ENTER}")
+		 Sleep(10000)
+		 WinClose($hRec)
 
 		 Clumsy($hClumsy, "stop")
 

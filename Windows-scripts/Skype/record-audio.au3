@@ -25,7 +25,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 Local $appName  = "C:\Program Files (x86)\Audacity\audacity.exe"
 Local $winTitle = "Audacity"
 Local $audio_len = 5000;in ms
-;Local $task = "start" ;$CmdLine[1]
+Local $task = $CmdLine[1]
 Global $loss = "3" ;$CmdLine[2]
 Global $hApp =""
 Global $app = "Skype"
@@ -50,7 +50,10 @@ EndIf
 
 ;============================ start recording=====================
 
-start_record()
+If $task == "start" Then
+   start_record()
+ElseIf $task == "stop" Then
+   Stop_record()
 
 If $loss <> 0 Then
 	;parse results and compute PESQ
@@ -64,7 +67,13 @@ Func start_record()
 	Sleep(2000)
 	;start recording
 	Send("+R") ; Shift(+) and R to start recording in audacity
-	Sleep($audio_len)
+
+EndFunc
+
+Func stop_record()
+   ;activate app window first
+	WinActivate($winTitle)
+	Sleep(1000)
 	Send("{SPACE}") ; stop recording
 	Sleep(600)
 	;export to WAV
