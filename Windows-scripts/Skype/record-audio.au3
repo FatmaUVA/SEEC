@@ -54,6 +54,8 @@ If $task == "start" Then
    start_record()
 ElseIf $task == "stop" Then
    Stop_record()
+EndIf
+
 
 If $loss <> 0 Then
 	;parse results and compute PESQ
