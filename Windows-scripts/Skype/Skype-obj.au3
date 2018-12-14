@@ -27,7 +27,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 ; ============================ Parameters initialization ====================
 ; QoS
 Local $aRTT[1] = [0];,50,100];1,2,5,10,50,100] ;,50, 150]
-Local $aLoss[1] = [33] ;,3,5];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
+Local $aLoss[2] = [0,4] ;,3,5];,3,5];,3] ;,0.05,1] ;packet loss rate, unit is %
 Global $app = "Skype"
 Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 
@@ -68,13 +68,14 @@ For $n = 1 To $no_of_runs:
 		 $hRec = RDP()
 		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 		 ;open command prompt in Caller PC
-		 Sleep(1500)
+		 Sleep(2000)
 		 OpenTerminal()
 		 Sleep(1000)
 		 ;run recording script
 		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 start " & $aLoss[$j]
 		 Send($cmd)
 		 Send("{ENTER}")
+		 WinClose("cmd")
 		 Sleep(3000)
 		 WinClose($hRec)
 
@@ -82,7 +83,7 @@ For $n = 1 To $no_of_runs:
 		 $hCall = RDP()
 		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 		 ;open command prompt in Recorder PC
-		 Sleep(1500)
+		 Sleep(2000)
 		 OpenTerminal()
 		 ;run recording script
 		 Sleep(1000)
@@ -90,7 +91,13 @@ For $n = 1 To $no_of_runs:
 		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\play-audio.au3"
 		 Send($cmd)
 		 Send("{ENTER}")
+		 WinClose("cmd")
+		 ;wait for the audio to finish playing
+		 Sleep(5000)
 		 WinClose($hCall)
+
+		 ;wait for the audio to finish playing
+		 ;Sleep(5000)
 
 		 ;==========run stop recording script at recording PC
 		 $hRec = RDP()
@@ -103,6 +110,7 @@ For $n = 1 To $no_of_runs:
 		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 stop " & $aLoss[$j]
 		 Send($cmd)
 		 Send("{ENTER}")
+		 WinClose("cmd")
 		 Sleep(10000)
 		 WinClose($hRec)
 
