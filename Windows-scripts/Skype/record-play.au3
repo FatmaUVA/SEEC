@@ -23,42 +23,23 @@
 Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=Nocase ;used for WInWaitActive title matching
 
 Local $appName  = "C:\Program Files (x86)\Audacity\audacity.exe"
-Local $winTitle = "Audacity"
-Local $audio_len = 5000;in ms
-Local $task = "stop" ;$CmdLine[1]
-Global $loss = 10 ;$CmdLine[2]
+Global $winTitle = "Audacity"
+;Local $audio_len = 5000;in ms
+Global $loss = $CmdLine[1]
 Global $hApp =""
 Global $app = "Skype"
-Global $runNo = "3-model3"
-Local $logDir = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype"
 
-#comments-start
-;============================= Create a file for results======================
-; Create file in same folder as script
-Global $sFileName = $logDir &"\" & $app &"_PESQ_run_"& $runNo  ;".txt"
 
-; Open file
-Global $hFilehandle = FileOpen($sFileName, $FO_APPEND)
-
-; Prove it exists
-If FileExists($sFileName) Then
-    ;MsgBox($MB_SYSTEMMODAL, "File", "Exists")
-Else
-    MsgBox($MB_SYSTEMMODAL, "File", "Does not exist")
+start_record()
+play_audio()
+stop_record()
+If Number($loss) > 0 or $loss == "0-5" Then
+	;parse results and compute PESQ
+	parse($loss)
 EndIf
-#comments-end
 
-;============================ start recording=====================
-
-If $task == "start" Then
-   start_record()
-ElseIf $task == "stop" Then
-   ;Stop_record()
-   If $loss <> 0 or $loss == "0-5" Then
-		;parse results and compute PESQ
-		parse($loss)
-	EndIf
-EndIf
+;close audio file
+WinClose("Windows Media Player")
 
 
 Func start_record()
@@ -67,13 +48,24 @@ Func start_record()
 	Sleep(2000)
 	;start recording
 	Send("+R") ; Shift(+) and R to start recording in audacity
-
 EndFunc
+
+Func play_audio()
+	Local $appName  = "C:\Users\fha6np\Desktop\u_am1s03.wav"
+	Local $winTitle = "Windows Media Player"
+	Local $audio_len = 6500;in ms
+
+	ShellExecute($appName)
+	$hApp = WinWaitActive($winTitle)
+	Sleep($audio_len)
+	return $hApp
+EndFunc
+
 
 Func stop_record()
    ;activate app window first
 	WinActivate($winTitle)
-	Sleep(1000)
+	;Sleep(1000)
 	Send("{SPACE}") ; stop recording
 	Sleep(600)
 	;export to WAV
@@ -89,11 +81,11 @@ Func stop_record()
 	WinClose($winTitle)
 	Send("{TAB}")
 	Send("{Enter}")
-
 EndFunc
 
 Func parse($loss)
 	OpenTerminal()
+	Sleep(600)
 	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\loss-0.wav  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
 	Send($cmd)
 	Send("{ENTER}")

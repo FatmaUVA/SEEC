@@ -21,7 +21,7 @@
 
 Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=Nocase ;used for WInWaitActive title matching
 
-Local $appName  = "C:\Users\fha6np\Desktop\loss-0.wav"
+Local $appName  = "C:\Users\fha6np\Desktop\or105.wav"
 Local $winTitle = "Windows Media Player"
 Local $audio_len = 5000;in ms
 
