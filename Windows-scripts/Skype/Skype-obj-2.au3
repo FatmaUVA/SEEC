@@ -3,8 +3,7 @@
  AutoIt Version: 3.3.14.5
  Author:         Fatma Alali
  Script Function:
-	RT objective test for 360 image view, includes 3 tasks,  move (drag and drop), zoom-n, and zoom-out, repeats the same 3 tasks for xx images
-	This test use web-based application to explore the 360 images
+In this script the caller and recording scripts are executed in one PC, so one RDP seesion is created tos tart recording, play the audio, stop recording, and parse results
 #ce ----------------------------------------------------------------------------
 
 ; Script Start - Add your code below here
@@ -34,7 +33,7 @@ Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 Local $clinetIPAddress = "172.28.30.13" ;.9 for Wyse 5030 and 22 for Chromebook, .13 LG ZC
 Global $udpPort = 60000
 Global $runNo = "1-model4"
-Local $no_of_runs = 1
+Local $no_of_runs = 20
 
 Global $appName  = "C:\Users\Harlem5\Desktop\RemoteDesktop.lnk"
 Global $winTitle = "Remote Desktop"
@@ -51,9 +50,14 @@ Local $hClumsy = Clumsy("", "open", $clinetIPAddress)
 ;maximizing the window is not working, so I'm doing it manually
 ;WinMove($hApp,"",0,0,@DesktopWidth, @DesktopHeight)
 
-For $n = 1 To $no_of_runs:
-   For $j = 0 To UBound($aLoss) - 1
-	  For $i = 0 To UBound($aRTT) - 1
+$hRec = RDP()
+WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
+Sleep(2000)
+
+
+For $n = 1 To $no_of_runs
+   For $i = 0 To UBound($aRTT) - 1
+	  For $j = 0 To UBound($aLoss) - 1
 		 ;configure clumsy
 		 Clumsy($hClumsy, "configure","",$aRTT[$i], $aloss[$j])
 		 Clumsy($hClumsy, "start")
@@ -64,54 +68,14 @@ For $n = 1 To $no_of_runs:
 		 EndIf
 
 		 ;==========run recording script at recording PC
-		 $hRec = RDP()
-		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 		 ;open command prompt in Caller PC
-		 Sleep(2000)
 		 OpenTerminal()
 		 Sleep(1000)
 		 ;run recording script
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 start " & $loss
+		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-play.au3 " & $loss
 		 Send($cmd)
 		 Send("{ENTER}")
-		 WinClose("cmd")
-		 Sleep(3000)
-		 WinClose($hRec)
-
-		 ;========run playing audio script at caller PC
-		 $hCall = RDP()
-		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
-		 ;open command prompt in Recorder PC
-		 Sleep(2000)
-		 OpenTerminal()
-		 ;run recording script
-		 Sleep(1000)
-		 ;run audio playing script
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\play-audio.au3"
-		 Send($cmd)
-		 Send("{ENTER}")
-		 WinClose("cmd")
-		 ;wait for the audio to finish playing
-		 Sleep(5000)
-		 WinClose($hCall)
-
-		 ;wait for the audio to finish playing
-		 ;Sleep(5000)
-
-		 ;==========run stop recording script at recording PC
-		 $hRec = RDP()
-		 WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
-		 ;open command prompt in Caller PC
-		 Sleep(1500)
-		 OpenTerminal()
-		 Sleep(1000)
-		 ;run recording script
-		 $cmd = "C:\Users\fha6np\Desktop\SEEC\Windows-scripts\Skype\record-audio.au3 stop " & $loss
-		 Send($cmd)
-		 Send("{ENTER}")
-		 WinClose("cmd")
-		 Sleep(10000)
-		 WinClose($hRec)
+		 Sleep(22000)
 
 		 Clumsy($hClumsy, "stop")
 
@@ -119,6 +83,7 @@ For $n = 1 To $no_of_runs:
    Next
 Next
 
+WinClose($hRec)
 WinClose($hClumsy)
 
 
