@@ -25,7 +25,7 @@ Opt("WinTitleMatchMode",-2) ;1=start, 2=subStr, 3=exact, 4=advanced, -1 to -4=No
 Local $appName  = "C:\Program Files (x86)\Audacity\audacity.exe"
 Global $winTitle = "Audacity"
 ;Local $audio_len = 5000;in ms
-Global $loss = $CmdLine[1]
+Global $loss = $CmdLine[1] ;"model1-16-ref"
 Global $hApp =""
 Global $app = "Skype"
 
@@ -33,14 +33,14 @@ Global $app = "Skype"
 start_record()
 play_audio()
 stop_record()
-If Number($loss) > 0 or $loss == "0-5" Then
+parse($loss)
+;If Number($loss) > 0 or $loss == "0-5" Then
 	;parse results and compute PESQ
-	parse($loss)
-EndIf
+;	parse($loss)
+;EndIf
 
 ;close audio file
 WinClose("Windows Media Player")
-
 
 Func start_record()
 	ShellExecute($appName)
@@ -86,10 +86,10 @@ EndFunc
 Func parse($loss)
 	OpenTerminal()
 	Sleep(600)
-	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\loss-0.wav  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
+	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\loss-model1-16-ref.wav  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
 	Send($cmd)
 	Send("{ENTER}")
-	Sleep(800)
+	Sleep(2500)
 	While WinClose("cmd")
 	WEnd
 
