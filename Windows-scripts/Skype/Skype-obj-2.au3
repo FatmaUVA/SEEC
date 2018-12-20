@@ -33,12 +33,10 @@ Local $logDir = "C:\Users\Harlem5\SEEC\Windows-scripts"
 Local $clinetIPAddress = "172.28.30.13" ;.9 for Wyse 5030 and 22 for Chromebook, .13 LG ZC
 Global $udpPort = 60000
 Global $runNo = "1-model4"
-Local $no_of_runs = 20
+Local $no_of_runs = 5
 
 Global $appName  = "C:\Users\Harlem5\Desktop\RemoteDesktop.lnk"
 Global $winTitle = "Remote Desktop"
-
-Global $no_tasks =  1
 
 
 
@@ -55,9 +53,10 @@ WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 Sleep(2000)
 
 
-For $n = 1 To $no_of_runs
+For $j = 0 To UBound($aLoss) - 1
    For $i = 0 To UBound($aRTT) - 1
-	  For $j = 0 To UBound($aLoss) - 1
+	  For $n = 1 To $no_of_runs
+
 		 ;configure clumsy
 		 Clumsy($hClumsy, "configure","",$aRTT[$i], $aloss[$j])
 		 Clumsy($hClumsy, "start")
@@ -146,10 +145,12 @@ Func Clumsy($hWnd, $cmd, $clinetIPAddress="0.0.0.0", $RTT=0, $loss=0)
 	  ControlSetText($hWnd,"", "Edit3", $loss)
 
    ElseIf $cmd = "start" Then
+	  WinActivate($hWnd)
 	  ;click the start button
 	  ControlClick($hWnd, "","Button2", "left", 1,8,8)
 
    ElseIf $cmd = "stop" Then
+	  WinActivate($hWnd)
 	  ;click the start button
 	  ControlClick($hWnd, "","Button2", "left", 1,8,8)
 
