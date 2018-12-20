@@ -28,6 +28,9 @@ Global $winTitle = "Audacity"
 Global $loss = $CmdLine[1] ;"model1-16-ref"
 Global $hApp =""
 Global $app = "Skype"
+Global $ref_audio = "loss-model1-16-ref.wav" ; audio file to use as refernce for PESQ calculation
+Global $audio_file = "u_am1s03.wav" ;audio file to feed to SKype
+Global $audio_len = 6500 ;8500 ;6500;in s
 
 
 start_record()
@@ -51,9 +54,8 @@ Func start_record()
 EndFunc
 
 Func play_audio()
-	Local $appName  = "C:\Users\fha6np\Desktop\u_am1s03.wav"
+	Local $appName  = "C:\Users\fha6np\Desktop\" & $audio_file
 	Local $winTitle = "Windows Media Player"
-	Local $audio_len = 6500;in ms
 
 	ShellExecute($appName)
 	$hApp = WinWaitActive($winTitle)
@@ -86,10 +88,10 @@ EndFunc
 Func parse($loss)
 	OpenTerminal()
 	Sleep(600)
-	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\loss-model1-16-ref.wav  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
+	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\" & $ref_audio & "  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
 	Send($cmd)
 	Send("{ENTER}")
-	Sleep(2500)
+	Sleep(2500) ;2500)
 	While WinClose("cmd")
 	WEnd
 
