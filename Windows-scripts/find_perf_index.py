@@ -14,6 +14,8 @@ import scipy.stats
 def Compute_perf (model):
     global perf_base
     global loss_uniq
+    global by
+    global rt
     #===================Read data======================
     #two arrays RT and Bytes. each array has all the runs 
     if model == 3:
@@ -84,12 +86,17 @@ def Compute_perf (model):
         rt_meth = "rt_"+meth
         by_meth = "by_"+meth
         for l in loss_uniq:
+       
+
             temp2 = "loss_" + str(l) + "_index"
             rt_loss = "rt_"+meth+"_loss_" + str(l)
             by_loss = "by_"+meth+"_loss_" + str(l)
             for i in globals()[temp2]:
                 globals()[rt_loss].append(globals()[rt_meth][i])
                 globals()[by_loss].append(globals()[by_meth][i])
+
+    rt_gmean = []
+    by_gmean = []
 
     #find performanc index
     for meth in method:
@@ -122,6 +129,11 @@ def Compute_perf (model):
                         temp.append(globals()[perf_loss][i])
                 globals()[perf_loss] = []
                 globals()[perf_loss] = temp
+            rt.append(np.mean(scipy.stats.mstats.gmean(globals()[rt_loss], axis=1)))
+            by.append(np.mean(scipy.stats.mstats.gmean(globals()[by_loss], axis=1)))
+            print(str(l)," ",scipy.stats.mstats.gmean(globals()[by_loss], axis=1))
+        print("RT ",rt)
+        print("By ",by)
 
     #        print(perf_loss," ",globals()[perf_loss])
 
@@ -147,10 +159,10 @@ def Compute_perf (model):
 #=====================Initialize parameters===============
 #input arguments
 #for objective
-app = "ImageView" #"Insta360" #"ImageView" #"Web360"
+app = "ImageView" #"Web360" #"ImageView" 
 method=["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
-run_no_model3 = "3-Pics13-model3" #"1-model3" #"1-model4" # "3-pics2"360 #"1-Pics13"image
-run_no_model4 = "1-Pics13" #"1-model4" #"1-Pics13"
+run_no_model3 = "1-Pics14-model3" #"3-model3" #"1-Pics14-model3" 
+run_no_model4 = "3-Pics14-model4" #"3-model4" #"1-Pics14-model4"
 
 
 res_dir="/home/harlem1/SEEC/Windows-scripts/results"
@@ -158,10 +170,18 @@ plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/new-mean'
 
 perf_base = 0
 loss_uniq = []
-
+rt = []
+by = []
 
 perf_model3 = Compute_perf(3)
+rt_model3 = rt
+by_model3 = by
+rt = []
+by = []
+
 perf_model4 = Compute_perf(4)
+rt_model4 = rt
+by_model4 = by
 perf_model3 = np.asarray(perf_model3)
 perf_model4 = np.asarray(perf_model4)
 
@@ -173,7 +193,7 @@ print("model4 1/perf ",100/perf_model4)
 
 #===============plot===============
 #plot_name='/perf-x-axis-'+app+'-total-runs-'+str(total_runs)+'-run-'+str(run_no)+'.png'
-plot_name='/perf-x-axis-'+app+'-run-'+str(run_no_model4)+'.png'
+plot_name='/perf-'+app+'-model3-vs-model4-run-'+str(run_no_model4)+'.png'
 
 colors = cm.rainbow(np.linspace(0, 7, 20))
 markers = ['^','s','o','*','x','D','+']
@@ -184,4 +204,29 @@ plt.plot(loss_uniq,100/perf_model3,color=colors[0],marker=markers[0],linewidth=2
 plt.plot(loss_uniq,100/perf_model4,color=colors[1],marker=markers[1],linewidth=2.0,markersize=10,label = "Model 4")
 
 plt.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,1.18))
+#plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
+#plt.show()
+
+#plot RT and Bytes seperatly
+plot_name='/DUT-and-bytes-'+app+'-model3-vs-model4-run-'+str(run_no_model4)+'.png'
+fig, ax1 = plt.subplots(1)
+ax1.set_xlabel('packet loss rate (%)',fontsize=14)
+ax1.set_ylabel(app+' DUT (sec)')
+#ax1.set_ylim(0,9)
+#plt.xticks(loss_uniq, xticks_title)
+
+ax1.plot(loss_uniq,rt_model3,color=colors[0],marker=markers[0],linewidth=2.0,markersize=10,label = "Model 3")
+ax1.plot(loss_uniq,rt_model4,color=colors[1],marker=markers[1],linewidth=2.0,markersize=10,label = "Model 4")
+
+#create anothor axis for number of bytes
+ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+ax2.set_ylabel('Display Update Size (MBytes)')  # we already handled the x-label with ax1
+#ax2.set_ylim(0,0.3)
+
+ax2.plot(loss_uniq,by_model3,color=colors[0],marker=markers[0],linewidth=2.0,linestyle='dashed',markersize=10,label = "Model 3")
+ax2.plot(loss_uniq,by_model4,color=colors[1],marker=markers[1],linewidth=2.0,linestyle='dashed',markersize=10,label = "Model 4")
+
+ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,1.18))
+ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,-0.1))
+#plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
 plt.show()
