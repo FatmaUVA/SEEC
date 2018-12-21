@@ -51,5 +51,5 @@ plt.ylabel(app+' PESQ')
 #plt.ylim(1,4.5)
 plt.errorbar(loss_uniq,pesq,yerr=pesq_error,color=colors[0],marker=markers[0],linewidth=2.0,markersize=10)
 
-#plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
+plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
 plt.show()
