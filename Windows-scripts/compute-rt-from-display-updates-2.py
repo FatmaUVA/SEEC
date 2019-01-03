@@ -1,6 +1,7 @@
 #This is a python3 code
 #input: dst_IP pcap rtt loss app run_no
 #python3 compute-rt-from-display-updates-2.py 172.28.30.9 capture-1-slow.pcap 200 10 imgeView 13 5
+# RT is computed in this script based on the inter-arrival time between the ;arge packets (packet size > 110 B)
 
 import sys, os
 import numpy as np
@@ -18,6 +19,7 @@ app=sys.argv[5]
 run_no=sys.argv[6]
 count=sys.argv[7]
 
+# WIll be parsed in marker packets script, no need to parse again!
 parsed_pcap="tshark-pckts-parsed-rtt-"+rtt+"-loss-"+loss+"-run-no-"+run_no+"-count-"+count # to keep each parsed pcap in case we want to try new threshold value
 res_dir="/home/harlem1/SEEC/Windows-scripts/results"
 th_time = 0.500 #threshhold interarrival time to represent new update (unit sec)
@@ -37,7 +39,7 @@ sizex = []
 tsx = []
 portx = []
 for j in range(len(size)):
-    if size[j]<110:
+    if size[j]<=110:
         if port[j] == 60000: #include also marker packets to compute rt
             sizex.append(size[j])
             tsx.append(ts[j])
@@ -90,9 +92,9 @@ for i in range(0,len(mk_index),2): #step by 2 because the 2nd marker would be th
             break
 
     temp_pckts = np.asarray(temp_pckts)
-    ts_diff = np.ediff1d(temp_pckts)
-    xx="xx-display-" + str(index)
-    np.savetxt(xx, ts_diff)
+    #ts_diff = np.ediff1d(temp_pckts)
+    #xx="xx-display-" + str(index)
+    #np.savetxt(xx, ts_diff)
 
 '''
     #to print statistics about inter-arrival time between packets (between marker packets)
