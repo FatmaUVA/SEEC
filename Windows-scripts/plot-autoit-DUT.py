@@ -16,6 +16,8 @@ def Read_data(run_no,meth):
     #two arrays RT and Bytes. each array has all the runs 
     
     file_name = app + "_RT_"+meth+"_run_"+str(run_no)
+#    if meth !="autoit":
+#        file_name = app + "_RT_"+meth+"_run_"+str(run_no)+"-10"
     print("file name " ,file_name)
     #read data, all the colunm
     data_meth = "data-" + meth
@@ -39,7 +41,7 @@ def Read_data(run_no,meth):
     rtt_unique = np.unique(rtt)
 
     #read bytes
-    if meth != "autoit":
+    if meth != "autoit" and meth != "marker_packets_2":
         by_meth = "by_"+meth
         globals()[by_meth] = globals()[data_meth][:,np.arange(2+no_tasks,(2+no_tasks*2))]
         globals()[by_meth] = globals()[by_meth] /10e6 # change it to MB
@@ -48,10 +50,10 @@ def Read_data(run_no,meth):
     #if autoit, hten donnot return by_meth cause there are none
     return globals()[rt_meth], rtt, loss, loss_uniq
 
-def Compute_t(rt_meth, by_meth,rt_autoit, rtt, loss, loss_uniq):
+def Compute_t(rt_meth, by_meth,rt_autoit, rt_marker,rtt, loss, loss_uniq):
     global rt
     global by
-    method = ["autoit","display_updates_2"]
+    method = ["autoit","display_updates_2","marker_packets_2"]
     #==============Pre-process data===================
     #find indices where loss value equal to specific value and RTT of 0
     rtt_0 = np.where(rtt==0)
@@ -86,7 +88,7 @@ def Compute_t(rt_meth, by_meth,rt_autoit, rtt, loss, loss_uniq):
             by_loss = "by_"+meth+"_loss_" + str(l)
             for i in globals()[temp2]:
                 globals()[rt_loss].append(globals()[rt_meth][i])
-                if meth != "autoit":
+                if meth != "autoit" and meth !="marker_packets_2":
                      globals()[by_loss].append(globals()[by_meth][i])
 
 
@@ -109,14 +111,28 @@ def Compute_t(rt_meth, by_meth,rt_autoit, rtt, loss, loss_uniq):
             globals()[by_DUT_loss] = np.asarray(globals()[by_DUT_loss])
 
             globals()[rt_diff_loss] = globals()[rt_DUT_loss] -  globals()[rt_autoit_loss]
+            #remove values that has autoit time > DUT! which is weird 
+            ind = np.where(globals()[rt_diff_loss] <= 0)
+            print "ind[0]",ind[0]
+            print "diff[ind] ",globals()[rt_diff_loss][ind[0]]
+            globals()[rt_diff_loss] = np.delete(globals()[rt_diff_loss], ind[0],axis=0)
+            print np.shape(globals()[rt_diff_loss])
+            globals()[rt_DUT_loss] = np.delete(globals()[rt_DUT_loss], ind[0],axis=0)
+            globals()[by_DUT_loss] = np.delete(globals()[by_DUT_loss], ind[0],axis=0)
+            globals()[rt_autoit_loss] = np.delete(globals()[rt_autoit_loss], ind[0],axis=0)
+
             globals()[rt_trans_loss] = globals()[by_DUT_loss]*8 / 1e3 #bytes are in MBytes, and link rate is 1Gbps
             globals()[rt_proc_retrans] = globals()[rt_diff_loss] - globals()[rt_trans_loss]
             
 
+        rt_autoit,by,rt_autoit_error,by_error = compute_mean("rt_autoit_loss_",loss_uniq,total_runs)
+        rt_DUT,by,rt_DUT_error,by_error = compute_mean("rt_display_updates_2_loss_",loss_uniq,total_runs)
+        rt_marker,by,rt_marker_error,by_error = compute_mean("rt_marker_packets_2_loss_",loss_uniq,total_runs)
         rt_proc,by,rt_proc_error,by_error = compute_mean("rt_proc_"+meth+"_loss_",loss_uniq,total_runs)
         rt_diff,by,rt_diff_error,by_error = compute_mean("rt_diff_"+meth+"_loss_",loss_uniq,total_runs)
         rt_trans,by,rt_trans_error,by_error = compute_mean("rt_trans_"+meth+"_loss_",loss_uniq,total_runs)
-        return rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,by,by_error
+        #return rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,by,by_errorQ
+        return rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,rt_DUT, rt_DUT_error, rt_autoit, rt_autoit_error,rt_marker,rt_marker_error,by,by_error
     
 def compute_mean(arr_name,loss_uniq,total_runs):        
     #find mean of gmean of each run
@@ -134,22 +150,22 @@ def compute_mean(arr_name,loss_uniq,total_runs):
             by_loss = "by_"+meth+"_loss_" + str(l)
             
             globals()[rt_loss] = np.asarray(globals()[rt_loss])
-            if meth != "autoit":
+            if meth != "autoit" and meth != "marker_packets_2":
                 globals()[by_loss] = np.asarray(globals()[by_loss])
             
             rt_loss_gmean = scipy.stats.mstats.gmean(globals()[rt_loss], axis=1) # for each loss value find gmean of each run
-            if meth != "autoit":
+            if meth != "autoit" and meth != "marker_packets_2":
                 by_loss_gmean = scipy.stats.mstats.gmean(globals()[by_loss], axis=1)
             rt.append(np.mean(rt_loss_gmean))
-            if meth !="autoit":
+            if meth !="autoit" and meth != "marker_packets_2":
                 by.append(np.mean(by_loss_gmean))
 
             #find std to compute error bar
             rt_loss_std = np.std(rt_loss_gmean)
-            if meth !="autoit":
+            if meth !="autoit" and meth != "marker_packets_2":
                 by_loss_std = np.std(by_loss_gmean)
             rt_std.append(rt_loss_std)
-            if meth !="autoit":
+            if meth !="autoit" and meth != "marker_packets_2":
                 by_std.append(by_loss_std)
 
         #find error bar: Standared Error (SE) = std/sqrt(n), upper limit = mean + SE*z
@@ -157,11 +173,11 @@ def compute_mean(arr_name,loss_uniq,total_runs):
         rt_std = np.asarray(rt_std)
         rt = np.asarray(rt)
         rt_error = z*(rt_std / math.sqrt(total_runs))
-        if meth != "autoit":
+        if meth != "autoit" and meth != "marker_packets_2":
             by_std = np.asarray(by_std)
             by = np.asarray(by)
             by_error = z*(by_std / math.sqrt(total_runs))
-
+        print arr_name
         print("RT ",rt)
         print("By ",by)
         print("rt_error",rt_error)
@@ -172,7 +188,7 @@ def compute_mean(arr_name,loss_uniq,total_runs):
 #input arguments
 #for objective
 App = ["ImageView" ] #,"Web360"] #"ImageView" 
-method=["autoit","display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
+method=["autoit","display_updates_2","marker_packets_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
 Run_no = ["1-Pics14-model4"] #, "3-model3"] #"3-model4" #"1-Pics14-model4"
 
 res_dir="/home/harlem1/SEEC/Windows-scripts/results"
@@ -182,7 +198,7 @@ app = App[0]
 i=0
 rt_autoit, rtt, loss_autoit, loss_uniq = Read_data(Run_no[0],method[0])
 rt_DUT,by_DUT, rtt, loss, loss_uniq = Read_data(Run_no[0],method[1])
-print rt_DUT
+rt_marker, rtt, loss, loss_uniq = Read_data(Run_no[0],method[2])
 
 #create arrays based on loss value, each array has all the images in a row, where each row is different run
 for meth in method:
@@ -190,10 +206,11 @@ for meth in method:
         rt_loss = "rt_"+meth+"_loss_" + str(l)
         globals()[rt_loss] = []
 
-        if meth != "autoit":
+        if meth != "autoit" and meth != "marker_packets_2":
             by_loss = "by_"+meth+"_loss_" + str(l)
             globals()[by_loss] = []
 
+        rt_meth_loss = "rt_"+meth+"_loss_" + str(l)
         rt_diff_loss = "rt_diff_"+meth+"_loss_" + str(l)
         rt_trans_loss = "rt_trans_"+meth+"_loss_" + str(l)
         rt_proc_retrans = "rt_proc_"+meth+"_loss_" + str(l)
@@ -205,24 +222,31 @@ for meth in method:
 #===============plot===============
 
 #plot RT and Bytes seperatly
-plot_name='/DUT-and-bytes-'+str(Run_no[0])+'.png'
+plot_name='/'+App[0]+'-DUT-and-bytes-'+str(Run_no[0])+'.png'
 
-colors = cm.rainbow(np.linspace(0, 7, 20))
+colors = cm.rainbow(np.linspace(0, 7, 40))
 markers = ['^','s','o','*','x','D','+']
 fig, ax1 = plt.subplots(1)
 ax1.set_xlabel('packet loss rate (%)',fontsize=14)
-ax1.set_ylabel('DUT (sec)')
+ax1.set_ylabel('Time (sec)')
 #ax1.set_ylim(5,7)
 
 i = 0
 for app in App:
     #rt,by,rt_error,by_error = 
-    rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,by,by_error = Compute_t(rt_DUT, by_DUT,rt_autoit, rtt, loss,loss_uniq)
-    ax1.errorbar(loss_uniq,rt_proc,color=colors[i],yerr=rt_proc_error,marker=markers[i],linewidth=2.0,markersize=10,label = app+' t_proc')
+    #rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,by,by_error = Compute_t(rt_DUT, by_DUT,rt_autoit, rtt, loss,loss_uniq)
+    rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,rt_DUT, rt_DUT_error, rt_autoit, rt_autoit_error,rt_marker, rt_marker_error, by,by_error = Compute_t(rt_DUT, by_DUT,rt_autoit,rt_marker, rtt, loss,loss_uniq)
+    ax1.errorbar(loss_uniq,rt_proc,color=colors[i],yerr=rt_proc_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'T=DUT-(t_trans+t_autoit)')
     i+=1
-    ax1.errorbar(loss_uniq,rt_trans,color=colors[i],yerr=rt_trans_error,marker=markers[i],linewidth=2.0,markersize=10,label = app+' t_trans')
+    ax1.errorbar(loss_uniq,rt_trans,color=colors[i],yerr=rt_trans_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_trans')
     i+=1
-    ax1.errorbar(loss_uniq,rt_diff,color=colors[i],yerr=rt_diff_error,marker=markers[i],linewidth=2.0,markersize=10,label = app+' t_diff')
+    ax1.errorbar(loss_uniq,rt_diff,color=colors[i],yerr=rt_diff_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_n=DUT - t_autoit')
+    i+=1
+    ax1.errorbar(loss_uniq,rt_DUT,color=colors[i],yerr=rt_DUT_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'DUT')
+    i+=1
+    ax1.errorbar(loss_uniq,rt_autoit,color=colors[i],yerr=rt_autoit_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_autoit')
+    i+=1
+    ax1.errorbar(loss_uniq,rt_marker,color=colors[i],yerr=rt_marker_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_marker')
 
 #create anothor axis for number of bytes
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -235,5 +259,5 @@ for app in App:
 
 ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.2,1.18))
 ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,-0.1))
-#plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
+plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
 plt.show()
