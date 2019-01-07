@@ -23,15 +23,15 @@ run_no="2-Pics14-model4"
 c=9
 
 res_dir="/home/harlem1/SEEC/Windows-scripts/results"
-th_time = 1 #threshhold interarrival time to represent new update (unit sec)
-res_file="inter_arrival_between_marker.txt"
+plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots/'
+th_time = 0.500 #threshhold interarrival time to represent new update (unit sec)
 
 #for c in range(1,count): #if I want plot many in a loop
-#parsed_pcap="tshark-pckts-parsed-rtt-"+str(rtt)+"-loss-"+str(loss)+"-run-no-"+run_no+"-count-"+str(c)
-pcap="/home/harlem1/capture-delay-0-loss-0.pcap"
-parsed_pcap="xx"
-command = "tshark -r " + pcap +" \"ip.dst=="+ dst_IP +" and not icmp\" | grep UDP | awk '{print $2,$7,$10}' > "+ res_dir + "/parsed-pcap/" + parsed_pcap
-os.system(command)
+parsed_pcap="tshark-pckts-parsed-rtt-"+str(rtt)+"-loss-"+str(loss)+"-run-no-"+run_no+"-count-"+str(c)
+#pcap="/home/harlem1/capture-delay-0-loss-0.pcap"
+#parsed_pcap="xx"
+#command = "tshark -r " + pcap +" \"ip.dst=="+ dst_IP +" and not icmp\" | grep UDP | awk '{print $2,$7,$10}' > "+ res_dir + "/parsed-pcap/" + parsed_pcap
+#os.system(command)
 #====================Process PCAP==========================
 #load the parsed pcap file data (ts, packet size, dst port)
 ts,size,port = np.loadtxt(res_dir+"/parsed-pcap/"+parsed_pcap, delimiter=' ', usecols=(0,1,2),unpack=True)
@@ -127,7 +127,6 @@ print "DUT ",DUT
 print "marker_rt ",marker_rt
 
 #========================Plot=======================
-plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/'
 plot_name1 = "packets-vs-time-DUT-Marker-"+str(rtt)+"-loss-"+str(loss)+"-run-no-"+run_no+"-count-"+str(c)
 
 fig, ax1 = plt.subplots(1)
@@ -144,6 +143,7 @@ plt.savefig(plot_dir + plot_name1+'.png',format="png",bbox_inches='tight')
 
 #plot 2 with ms x-axis, and aggregated packets every ms
 plot_name2 = "Kbits-vs-time-ms-DUT-Marker-"+str(rtt)+"-loss-"+str(loss)+"-run-no-"+run_no+"-count-"+str(c) 
+
 fig, ax1 = plt.subplots(1)
 ax1.set_xlabel('Time (ms)',fontsize=14)
 ax1.set_ylabel('KBits/1 ms')
@@ -154,6 +154,6 @@ for i in range(len(DUT)):
 custom_lines = [Line2D([0], [0], color='y', lw=2,label='DUT'), Line2D([0], [0], color='orange', lw=2,label='Marker-RT')]
 ax1.legend(loc='upper left', bbox_to_anchor=(0.2,1.18),ncol=2, handles=custom_lines)
 plt.savefig(plot_dir + plot_name2+'.png',format="png",bbox_inches='tight')
-plt.show()
+#plt.show()
 
 
