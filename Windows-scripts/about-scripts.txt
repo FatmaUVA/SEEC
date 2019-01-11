@@ -1,0 +1,23 @@
+
+1) plot-DUT-x-axis-loss-error-bar.py
+for different apps, this script plot in the x-axis the packet loss rate, in the left y-axis DUT, and right Y-axis total bytes.
+Each point is the mean of each run, and each run consist of multiple tasks (images) and the geo mean is computed for each each run.
+
+2) plot-autoit-DUT.py
+This script use autoit and DUT (display-updates-2) numbers to find: 
+- the diff of the two numbers.
+- computing transmision time
+- processing time + retrans (the remaining time)
+then plot all these times
+
+Also, it uses marker-packets timer 
+
+3) plot-marker-DUT-RT.py
+This script create two plots to show DUT and marker packets:
+i. x-axis: sec, Y-axis: packet size
+ii. x-axis: ms, Y-axis: total KBytes computed every ms
+ALso both plots have vertical lines indicate starts and end of DUT and marker RT
+
+4) Web360-plot-DUT-x-axis-loss-error-bar.py
+Specifically for Web360, plot one line for each task: drag and drop, zoom-in and zoom-out, where each run consist of visiting 3 images
+
