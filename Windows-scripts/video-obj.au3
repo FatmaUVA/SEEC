@@ -271,3 +271,11 @@ Func RDP()
 
    Return  $hRDP
 EndFunc
+
+Func OpenTerminal()
+   MouseClick("left",36,970,1) ;click on the search bar in the lower left corner on windows
+   Sleep(500)
+   Send("cmd")
+   Send("{ENTER}")
+   Sleep(500)
+EndFunc
