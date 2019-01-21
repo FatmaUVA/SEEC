@@ -273,7 +273,8 @@ Func RDP()
 EndFunc
 
 Func OpenTerminal()
-   MouseClick("left",36,970,1) ;click on the search bar in the lower left corner on windows
+    ;click on the search bar in the lower left corner on windows
+   MouseClick("left",36,970,1) ;TODO: change the x y coord
    Sleep(500)
    Send("cmd")
    Send("{ENTER}")
