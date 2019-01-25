@@ -26,21 +26,22 @@ Local $appName  = "C:\Program Files (x86)\Audacity\audacity.exe"
 Global $winTitle = "Audacity"
 ;Local $audio_len = 5000;in ms
 Global $loss = $CmdLine[1] ;"model1-16-ref"
+Global $metric = "wss" ;audio metric to use wss or pesq
 Global $hApp =""
 Global $app = "Skype"
-Global $ref_audio = "loss-model1-16-ref.wav" ; audio file to use as refernce for PESQ calculation
-Global $audio_file = "u_am1s03.wav" ;audio file to feed to SKype
-Global $audio_len = 6500 ;8500 ;6500;in s
+Global $ref_audio = "loss-model1-16-ref.wav" ;"loss-u_af1s02-model1-16k-ref.wav" ;"loss-model1-16-ref.wav" ; audio file to use as refernce for PESQ calculation
+Global $audio_file = "u_am1s03.wav" ;"u_af1s02.wav" ;audio file to feed to SKype
+Global $audio_len = 8500 ;6500; for u_af1s02 ;8500; for u_am1s03 ;6500;in s
 
 
 start_record()
 play_audio()
 stop_record()
 parse($loss)
-;If Number($loss) > 0 or $loss == "0-5" Then
+If Number($loss) > 0 or $loss == "0-5" Then
 	;parse results and compute PESQ
-;	parse($loss)
-;EndIf
+	parse($loss)
+EndIf
 
 ;close audio file
 WinClose("Windows Media Player")
@@ -88,12 +89,34 @@ EndFunc
 Func parse($loss)
 	OpenTerminal()
 	Sleep(600)
-	$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\" & $ref_audio & "  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
-	Send($cmd)
-	Send("{ENTER}")
-	Sleep(2500) ;2500)
-	While WinClose("cmd")
-	WEnd
+	if $metric == "pesq" Then
+		$cmd = "C:\cygwin64\home\fha6np\ITU-T_pesq\bin\itu-t-pesq2005.exe  C:\Users\fha6np\Desktop\" & $ref_audio & "  C:\Users\fha6np\Desktop\loss-" & $loss &".wav {+}16000"
+		Send($cmd)
+		Send("{ENTER}")
+		Sleep(2500) ;2500)
+	Else
+		$cmd = 'CD C:\Users\fha6np\Downloads\composite\'
+		Send($cmd)
+		Send("{ENTER}")
+		Sleep(500)
+		$cmd = 'matlab -nodesktop -nosplash  -r "composite C:\Users\fha6np\Desktop\'& $ref_audio &' C:\Users\fha6np\Desktop\loss-' & $loss & '.wav ' & $loss&'"'
+		Send($cmd)
+		Send("{ENTER}")
+		;wait till matlab finish computation
+		$hMatlab = WinWaitActive("MATLAB Command Window")
+		;use the number of line to detect if matlab finished computing the metrics
+		$cc = ControlCommand($hMatlab,"", "Edit1", "GetLineCount","")
+		While $cc <= 5
+			;$cc = ControlCommand($hMatlab,"MATLAB Command Window", "Edit1", "SelectString",'LLR=')
+			$cc = ControlCommand($hMatlab,"", "Edit1", "GetLineCount","")
+			Sleep(500)
+		WEnd
+		WinClose($hMatlab)
+	EndIf
+
+	;close command prompt
+	;While WinClose("cmd")
+	;WEnd
 
 	;delete files
 	;FileDelete("C:\Users\fha6np\Desktop\loss-" & $loss &".wav")
