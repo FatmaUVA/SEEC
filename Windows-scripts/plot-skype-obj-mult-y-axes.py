@@ -19,9 +19,10 @@ plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots'
 res_dir="/home/harlem1/SEEC/Windows-scripts/Skype"
 file_name="parsed-skype-obj"
 app = "Skype"
+ref="m_3"
 method=["ViSQOL","WSS","LLR", "E-Model"]
 ff=["ViSQOL_results.txt","WSS_results.txt","LLR_results.txt"]
-ff=["loss-model1_ref_m_2_ViSQOL_results.txt","loss-model1_ref_m_2_WSS_results.txt","loss-model1_ref_m_2_LLR_results.txt"]
+ff=["loss-model1_ref_"+ref+"_ViSQOL_results.txt", "loss-model1_ref_"+ref+"_WSS_results.txt", "loss-model1_ref_"+ref+"_LLR_results.txt"]
 #e-model = [4.41,3.18,1.31,1.10,1.00]
 
 colors = cm.rainbow(np.linspace(0, 7, 20))
@@ -49,9 +50,9 @@ host.set_ylabel("ViSQL",fontsize=14)
 par1.set_ylabel("WSS",fontsize=14)
 par2.set_ylabel("LLR",fontsize=14)
 
-#host.set_ylim(1,4) #for ViSQL
+host.set_ylim(1,4) #for ViSQL
 #par1.set_ylim(9, 15) #for WSS
-#par2.set_ylim(0,0.02 ) #for LLR
+par2.set_ylim(0,0.02 ) #for LLR
 
 lines = []
 #========looop through files to compute mean and error bars
