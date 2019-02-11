@@ -136,15 +136,15 @@ def Compute (run_no):
 #for objective
 App = ["ImageView" ,"Web360"] #"ImageView" 
 method=["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
-Run_no = ["1-Pics14-model4", "3-model3"] #"3-model4" #"1-Pics14-model4"
-
+Run_no = ["1-Pics14-model4", "6-model4"] #"3-model4" #"1-Pics14-model4"
+legend_title = ["Image viewing", "360-degree image exploring"]
 res_dir="/home/harlem1/SEEC/Windows-scripts/results"
-plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/new-mean'
+plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots'
 
 #===============plot===============
 
 #plot RT and Bytes seperatly
-#plot_name='/DUT-and-bytes-'+App+'-model3-vs-model4-run-'+str(run_no_model4)+'.png'
+plot_name='/DUT-and-bytes-'+App[0]+'-and-'+App[1]+'.png'
 
 colors = cm.rainbow(np.linspace(0, 7, 20))
 markers = ['^','s','o','*','x','D','+']
@@ -156,20 +156,21 @@ ax1.set_ylabel('DUT (sec)')
 i = 0
 for app in App:
     rt,by,rt_error,by_error = Compute(Run_no[i])
-    ax1.errorbar(loss_uniq,rt,color=colors[i],yerr=rt_error,marker=markers[i],linewidth=2.0,markersize=10,label = app+' DUT')
+    ax1.errorbar(loss_uniq,rt,color=colors[i],yerr=rt_error,marker=markers[i],linewidth=2.0,markersize=10,label = legend_title[i]+' DUT')
     i+=1
 
 
 #create anothor axis for number of bytes
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 ax2.set_ylabel('Display Update Size (MBytes)')  # we already handled the x-label with ax1
-ax2.set_ylim(0,0.3)
+ax2.set_ylim(0,3)
 i = 0
 for app in App:
-    ax2.errorbar(loss_uniq,by,color=colors[i],yerr=by_error,marker=markers[i],linewidth=2.0,markersize=10,linestyle='dashed',label = app+' MB')
+    rt,by,rt_error,by_error = Compute(Run_no[i])
+    ax2.errorbar(loss_uniq,by,color=colors[i],yerr=by_error,marker=markers[i],linewidth=2.0,markersize=10,linestyle='dashed',label = legend_title[i]+' MB')
     i+=1
 
-ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,1.18))
-ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,-0.1))
-#plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
+ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.1,1.18))
+ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.1,-0.1))
+plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
 plt.show()
