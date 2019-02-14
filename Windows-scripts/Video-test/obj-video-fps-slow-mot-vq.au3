@@ -23,6 +23,8 @@
 
    For this script to run: You should have putty installed in the remote desktop
 						   Clumsy in the remote desktop
+						   pyhton installed in the remote desktop
+						   numpy installed (you can install it with pip and you may need to add it to the PATH)
 
 #ce ----------------------------------------------------------------------------
 
@@ -48,11 +50,8 @@ Local $aRTT[1] = [0]
 Local $aLoss[5] = [0,0.5,5,3,10] ;packet loss rate, unit is %
 Global $app = "Video"
 Local $videoDir = "C:\Users\Harlem5\SEEC\Windows-scripts\Video-test\"
-Local $vide1fps = "1fps-zootopia-cut-1080p-36-sec"
-Local $video24fps = "zootopia-cut-1080p-36-sec"
-
-Local $vidLength1fps = 864000 ;video length in ms (14:24 min)
-Local $vidLength24fps = 36000 ;video length in ms (36 sec)
+Local $vide1fps = "zootopia-cut-1080p-36-sec-1fps.mkv"
+Local $video24fps = "zootopia-cut-1080p-36-sec.mkv"
 
 
 GLobal $routerIP = "172.28.30.124" ; the ip address of the server acting as router and running packet capture
@@ -65,14 +64,8 @@ Global $udpPort = 60000
 
 Global $no_tasks = 6
 Global $runNo = "1-model4"
-Local $no_of_runs = 1
+Local $no_of_runs = 10
 
-
- $hPCoIP = PCoIP_stats("", "open")
- Sleep(10000)
- PCoIP_stats("$hPCoIP", "stop")
-
- #comments-start
 
 ;================= Start test =============================
 ;setup clumsy basic param to prepare for network configuration
@@ -82,56 +75,97 @@ Local $hClumsy = Clumsy("", "open", $clinetIPAddress)
 ;WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
 
 
-;loop based on teh loss and RTT values
-For $j = 0 To UBound($aLoss) - 1
-   For $i = 0 To UBound($aRTT) - 1
-	  ;configure clumsy
-	  Clumsy($hClumsy, "configure","",$aRTT[$i], $aloss[$j])
-	  Clumsy($hClumsy, "start")
+;repeat of n number of times
+For $n = 1 To $no_of_runs:
+   ;loop based on teh loss and RTT values
+   For $j = 0 To UBound($aLoss) - 1
+	  For $i = 0 To UBound($aRTT) - 1
 
-	  ;repeat of n number of times
-	  For $n = 1 To $no_of_runs:
+		 If $aLoss[$j] <> 0 Then
+			;configure clumsy
+			Clumsy($hClumsy, "configure","",$aRTT[$i], $aloss[$j])
+			Clumsy($hClumsy, "start")
+		 EndIf
 
-		 ;======play video at 1 fps========
-		 ; start packet capture
-		 router_command("start_capture")
-		 $hVideo = play_video($vide1fps)
-		 Sleep($vidLength1fps)
-		 WinClose($hVideo)
 
-		 ;stop capture
-		 router_command("stop_capture")
+		 ; only if PLR = 0 play at 1 fps and use it as a reference
+		 If $aLoss[$j] == 0 Then
+			;======play video at 1 fps========
+			; start packet capture
+			router_command("start_capture","slow")
+			;log time
+			Local $hTimer1fps = TimerInit() ;begin the timer and store the handler
+			$hVideo = play_video($vide1fps)
+			MouseClick("left",737,538,2)
+
+			;wait til the video finish playing by monitoring a specific pixel
+			$color = PixelGetColor(1655,916)
+			Sleep(10000)
+			While $color <> 3637692
+			   ;MsgBox($MB_OK,"","The pixel color is "& $color,$hVideo)
+			   $color = PixelGetColor(1655,916)
+			WEnd
+			Global $timeDiff1fps = TimerDiff($hTimer1fps) ; find the time difference from the first call of TImerInit
+			WinClose($hVideo)
+
+			;stop capture
+			router_command("stop_capture")
+		 EndIf
+
 
 	     ;======play video at 24 fps========
    		 ; start packet capture
-		 router_command("start_capture")
+		 router_command("start_capture","regular")
+
 
 		 ;Collect PCoIP logs
 	     $hPCoIP = PCoIP_stats("", "open")
+		 Sleep(500)
 
-		 $hVideo = play_video($vide24fps)
-		 Sleep($vidLength24fps)
+		 ;log time
+		 Local $hTimer24fps = TimerInit() ;begin the timer and store the handler
+		 $hVideo = play_video($video24fps)
+		 MouseClick("left",737,538,2) ; to exist full screen
+
+		 ;wait til the video finish playing by monitoring a specific pixel
+		 $color = PixelGetColor(1655,916)
+		 Sleep(10000)
+		 While $color <> 3637692
+			;MsgBox($MB_OK,"","The pixel color is "& $color,$hVideo)
+			$color = PixelGetColor(1655,916)
+		 WEnd
+		 Global $timeDiff24fps = TimerDiff($hTimer24fps) ; find the time difference from the first call of TImerInit
 		 WinClose($hVideo)
 
 		 ;stop capture
 		 router_command("stop_capture")
+		 Sleep(500)
 
 		 ;stop and export fps data
 		 PCoIP_stats("$hPCoIP", "stop")
 
 
-		 ;==========nalyze results=============
-		 router_command("analyze_results","",$aRTT[$i], $aLoss[$j],$n) ;$n is the count within one run
+		 ;==========analyze results=============
+		 router_command("analyze_vq","",$aRTT[$i], $aLoss[$j]) ;$n is the count within one run
 
+		 ; extract fps info by running process-fps code
+		 OpenTerminal()
+		 $hTerm = WinWaitActive("Command")
+		 Sleep(1000)
+		 Send("C:\Users\Harlem5\SEEC\Windows-scripts\Video-test\process-fps.py " & $aLoss[$j] & " " & $runNo )
+		 Send('{ENTER}')
+		 Sleep(7000)
+		 WinClose($hTerm)
 	  Next
 
-	  Clumsy($hClumsy, "stop")
+	  If $aLoss[$j] <> 0 Then
+		 Clumsy($hClumsy, "stop")
+	  EndIf
 
    Next
 Next
 
  WinClose($hClumsy)
- #comments-end
 
 
 
@@ -139,10 +173,6 @@ Func PCoIP_stats($hWnd, $cmd)
    If $cmd = "open" Then
 	  ShellExecute("C:\Users\Harlem5\Downloads\SSV_2.0.exe")
 	  $hWnd = WinWaitActive("PCoIP Session Statistics Viewe")
-	  ;basic setup
-	  ; clear the filter text filed
-	  ;Local $filter = "outbound and ip.DstAddr==" & $clinetIPAddress & " and udp.DstPort != "& $udpPort
-	  ;ControlSetText($hWnd,"", "Edit1", $filter)
 
 	  ;click on configure
 	  ControlClick($hWnd, "","WindowsForms10.Window.8.app.0.141b42a_r6_ad12", "left", 1,159,13) ;1 click 8,8 coordinate
@@ -170,6 +200,7 @@ Func PCoIP_stats($hWnd, $cmd)
 	  Send('{ENTER}')
 	  Sleep(500)
 	  Send('{ENTER}')
+	  Sleep(3000)
 	  WinClose("PCoIP Session Statistics Viewe")
 
    EndIf
@@ -195,6 +226,7 @@ Func router_command($cmd, $videoSpeed="slow", $rtt=0, $loss=0,$n=0); cmd: "start
 	;Send($routerIP)
 	ControlSend("","","",$routerIP)
 	ControlClick($hPutty, "","Button1", "left", 1,8,8)
+	Send("{ENTER}")
 
 	Local $hShell = WinWaitActive($routerIP & " - PuTTY")
 	Sleep(600)
@@ -245,6 +277,11 @@ Func router_command($cmd, $videoSpeed="slow", $rtt=0, $loss=0,$n=0); cmd: "start
 	  Send($command)
 	  Send("{ENTER}")
 
+	  ElseIf $cmd = "analyze_vq" Then
+	  $command = "bash SEEC/Windows-scripts/analyze_vq.sh  " & $timeDiff1fps & " " & $timeDiff24fps & " " & $loss & " " & $runNo ;Tasha TODO: cahnge the directory and the script, this script will not work for you
+	  Sleep(1000)
+	  Send($command)
+	  Send("{ENTER}")
 
 	EndIf
 
@@ -295,33 +332,13 @@ Func Clumsy($hWnd, $cmd, $clinetIPAddress="0.0.0.0", $RTT=0, $loss=0)
    EndIf
 EndFunc
 
-;Tasha TODO: you need to change the mouse clicks here to make sure it's working with your display
-Func RDP()
-   Local $winTitle = "Remote Desktop"
-   Local $appName  = "C:\Users\Harlem5\Desktop\RemoteDesktop.lnk" ;Tasha TODO: change directory
-
-   ;open the app
-   ShellExecute($appName,"", @SW_MAXIMIZE)
-   ;Sleep(600)
-   $hApp = WinWaitActive($winTitle)
-   WinMove($App,"",0,0,@DesktopWidth, @DesktopHeight)
-   Sleep(500)
-
-   ;connect to the remote desktop
-  ; MouseClick("left",151,207)
-   MouseClick("left",121,188)
-   $hRDP = WinWaitActive("caller") ;TODO: I nemed my connection caller, based on what you name your connection in RDP, use that name
-
-   WinClose($hApp)
-
-   Return  $hRDP
-EndFunc
 
 Func OpenTerminal()
     ;click on the search bar in the lower left corner on windows
-   MouseClick("left",36,970,1) ;TODO: change the x y coord
+   MouseClick("left",21,1030,1) ;TODO: change the x y coord
    Sleep(500)
    Send("cmd")
    Send("{ENTER}")
    Sleep(500)
+   Send("{ENTER}")
 EndFunc
