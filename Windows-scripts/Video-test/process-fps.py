@@ -9,7 +9,7 @@ loss = sys.argv[1]
 run_no = sys.argv[2]
 log_dir= r'C:\Users\Harlem5\SEEC\Windows-scripts\Video-test\fps-logs'
 res_file=log_dir +'\\fps_run_'+str(run_no)+'.txt'
-parsed_res='C:\\Users\\Harlem5\\SEEC\\Windows-scripts\\Video-test\\parsed-raw-fps\\fps_run_'+str(run_no)+'loss-'+str(loss)+'.txt'
+parsed_res='C:\\Users\\Harlem5\\SEEC\\Windows-scripts\\Video-test\\parsed-raw-fps\\fps_run_'+str(run_no)+'-loss-'+str(loss)+'.txt'
 
 #find the file
 #since PCoIP log file naming convension depends on time
@@ -22,7 +22,7 @@ for file1 in os.listdir(log_dir):
         print(log_dir + '\\' + file1)
         #read the CSV file
         #by,fps = np.loadtxt(log_dir + '\\' + file1,delimiter=',', usecols=(15,18), unpack=True,skiprows=1)
-        by,fps = np.genfromtxt(log_dir + '\\' + file1,delimiter=',', usecols=(15,18), unpack=True,skip_header=2,skip_footer=1)
+        by,fps = np.genfromtxt(log_dir + '\\' + file1,delimiter=',', usecols=(15,18), unpack=True,skip_header=3,skip_footer=2)
         
         print(fps)
         print("mean",np.mean(fps))
