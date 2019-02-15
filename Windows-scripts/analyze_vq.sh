@@ -8,7 +8,7 @@
 
 #runNo=$1
 
-
+#10 865597.4049 3857726 37652.7878 460378 .1147
 total_time_slow=$1
 total_time_regular=$2
 loss=$3
@@ -17,11 +17,11 @@ run_no=$4
 log_dir=/home/harlem1/SEEC/Windows-scripts
 pcap_file=capture-1
 
-total_bytes_slow=`tshark -q -z "io,stat,0,ip.src==172.28.30.13" -r $log_dir/$pcap_file-slow.pcap | grep '<>' | awk '{print $8}'`
+total_bytes_slow=`tshark -q -z "io,stat,0,ip.src==172.28.30.68" -r $log_dir/$pcap_file-slow.pcap | grep '<>' | awk '{print $8}'`
 echo "total bytes slow" $total_bytes_slow
 
 
-total_bytes_regular=`tshark -q -z "io,stat,0,ip.src==172.28.30.13" -r $log_dir/$pcap_file-regular.pcap | grep '<>' | awk '{print $8}'`
+total_bytes_regular=`tshark -q -z "io,stat,0,ip.src==172.28.30.68" -r $log_dir/$pcap_file-regular.pcap | grep '<>' | awk '{print $8}'`
 
 echo "total bytes regular" $total_bytes_regular
 
