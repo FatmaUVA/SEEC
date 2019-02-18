@@ -25,20 +25,14 @@
 						   Clumsy in the remote desktop
 						   pyhton installed in the remote desktop
 						   numpy installed (you can install it with pip and you may need to add it to the PATH)
+						   Mplayer
 
 #ce ----------------------------------------------------------------------------
 
 
 #include <EditConstants.au3>
-#include <GUIConstantsEx.au3>
-#include <StaticConstants.au3>
-#include <WindowsConstants.au3>
-#include <FileConstants.au3>
-#include <MsgBoxConstants.au3>
-#include <ButtonConstants.au3>
-#include <FontConstants.au3>
-#include <AutoItConstants.au3>
-#include <ScreenCapture.au3>
+
+
 
 #RequireAdmin ; this required for clumsy to work properlys
 
@@ -63,7 +57,12 @@ Local $clinetIPAddress = "172.28.30.13" ;"172.28.30.9" .9:Wyse5030, .22:chromebo
 Global $udpPort = 60000
 
 Global $runNo = "3-model4"
-Local $no_of_runs = 1
+Local $no_of_runs = 3
+
+
+
+
+
 
 
 ;================= Start test =============================
@@ -136,6 +135,9 @@ For $n = 1 To $no_of_runs:
 
 		 ;log time
 		 Local $hTimer24fps = TimerInit() ;begin the timer and store the handler
+
+
+
 		 If $player == "MPlayer" Then
 			play_video_MPlayer($video24fps,24)
 		 Else
