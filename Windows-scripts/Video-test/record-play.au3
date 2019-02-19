@@ -34,7 +34,7 @@ $hOBS = WinWait("OBS 22.0.2 (64-bit, windows) - Profile: Untitled - Scenes: Unti
 WinActivate($hOBS)
 ControlFocus($hOBS,"obs64","Qt5QWindowIcon9")
 
-%Start recoding and wait
+;Start recoding and wait
 ;WinActivate($hOBS)
 ;ControlFocus($hOBS,"obs64","Qt5QWindowIcon9")
 ControlSend($hOBS, "obs64","Qt5QWindowIcon9","{RALT}")
