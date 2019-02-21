@@ -82,8 +82,8 @@ for file_name in ff:
     pesq_std = np.asarray(pesq_std) #change it to np array to allow array operations
     pesq_error = z*(pesq_std / math.sqrt(total_runs))
 
-    #print pesq_mean
-    #print pesq_error
+    print pesq_mean
+    print pesq_error
 
     if method[index] == "FPS":
         p1 = host.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
