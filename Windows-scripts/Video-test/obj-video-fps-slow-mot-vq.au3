@@ -57,13 +57,7 @@ Local $clinetIPAddress = "172.28.30.13" ;"172.28.30.9" .9:Wyse5030, .22:chromebo
 Global $udpPort = 60000
 
 Global $runNo = "3-model4"
-Local $no_of_runs = 3
-
-
-
-
-
-
+Local $no_of_runs = 15
 
 
 ;================= Start test =============================
