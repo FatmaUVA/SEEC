@@ -56,8 +56,9 @@ Local $timeInterval = 20000
 Local $clinetIPAddress = "172.28.30.13" ;"172.28.30.9" .9:Wyse5030, .22:chromebook
 Global $udpPort = 60000
 
-Global $runNo = "3-model4"
-Local $no_of_runs = 15
+Global $runNo = "4-model4"
+Local $no_of_runs = 5
+
 
 
 ;================= Start test =============================
