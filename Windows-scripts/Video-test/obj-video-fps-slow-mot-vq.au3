@@ -57,7 +57,19 @@ Local $clinetIPAddress = "172.28.30.13" ;"172.28.30.9" .9:Wyse5030, .22:chromebo
 Global $udpPort = 60000
 
 Global $runNo = "4-model4"
-Local $no_of_runs = 15
+Local $no_of_runs = 1
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -91,6 +103,15 @@ For $n = 1 To $no_of_runs:
 
 		 ; only if PLR = 0 play at 1 fps and use it as a reference
 		 If $aLoss[$j] == 0 Then
+
+
+
+
+
+
+
+
+
 			;======play video at 1 fps========
 			; start packet capture
 			router_command("start_capture","slow")
