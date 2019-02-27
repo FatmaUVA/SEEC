@@ -61,7 +61,6 @@ Local $no_of_runs = 15
 
 
 
-
 ;================= Start test =============================
 
 
@@ -70,8 +69,6 @@ Local $no_of_runs = 15
 
 ;maximizing the window is not working, so I'm doing it manually
 ;WinMove($hRec,"",0,0,@DesktopWidth, @DesktopHeight-50)
-
-
 
 
 
@@ -92,11 +89,6 @@ For $n = 1 To $no_of_runs:
 
 		 ; only if PLR = 0 play at 1 fps and use it as a reference
 		 If $aLoss[$j] == 0 Then
-
-
-
-
-
 
 
 
