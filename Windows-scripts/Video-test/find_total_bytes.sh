@@ -12,7 +12,7 @@ app=$5
 runNo=$6
 count=$7 #count of euns within one execution (run)
 
-log_dir=/home/seec/Desktop/SEEC9/Windows-scripts #TODO
+log_dir=/home/harlem1/SEEC/Windows-scripts/
 
 #find total bytes usibg tshark and parse the bytes out of tshark output
 filter="io,stat,0,ip.dst=="$clientIP

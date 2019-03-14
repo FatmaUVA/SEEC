@@ -18,12 +18,13 @@ def make_patch_spines_invisible(ax):
 plot_dir='/home/harlem1/SEEC/Windows-scripts/Video-test'
 res_dir="/home/harlem1/SEEC/Windows-scripts/Video-test/fps-logs"
 
-method=["VQ (slow-mo)","Total Bytes","FPS"]
+method=["VQ (slow-mo)","Total update size (MBytes)","Frame per second (fps)"]
 
 colors = cm.rainbow(np.linspace(0, 7, 20))
 markers = ['^','s','o','*','x','D','+']
 
-ff=["vq-results-3-model4", "vq-results-3-model4", "fps_run_3-model4.txt"]
+#ff=["vq-results-3-model4", "vq-results-3-model4", "fps_run_3-model4.txt"]
+ff=["vq-results-3-and-4-model4", "vq-results-3-and-4-model4", "fps_run_3_and_4-model4.txt"]
 #=========setup plot enviroment
 fig, host = plt.subplots()
 fig.subplots_adjust(right=0.75)
@@ -41,10 +42,10 @@ make_patch_spines_invisible(par2)
 par2.spines["right"].set_visible(True)
 
 #set y-axes labels
-host.set_xlabel('packet loss rate (%)',fontsize=14)
-host.set_ylabel("FPS",fontsize=14)
+host.set_xlabel('Packet loss rate (%)',fontsize=14)
+host.set_ylabel("Frame per second (fps)",fontsize=14)
 par1.set_ylabel("VQ (slow-mo)",fontsize=14)
-par2.set_ylabel("Bytes",fontsize=14)
+par2.set_ylabel("Total update size (MBytes)",fontsize=14)
 
 host.set_ylim(1,25) #for FPS
 par1.set_ylim(0,1) #for VQ
@@ -55,7 +56,7 @@ lines = []
 index = 0
 for file_name in ff:
 #read data
-    if file_name == "fps_run_3-model4.txt":
+    if file_name == ff[2]:
         loss,pesq=np.loadtxt(res_dir +'/' + file_name, delimiter=' ',usecols=(0,1), unpack=True)
     else:
         if index == 0:
@@ -85,11 +86,11 @@ for file_name in ff:
     print pesq_mean
     print pesq_error
 
-    if method[index] == "FPS":
+    if method[index] == "Frame per second (fps)":
         p1 = host.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
     elif method[index] == "VQ (slow-mo)":
         p1 = par1.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
-    elif method[index] == "Total Bytes":
+    elif method[index] == "Total update size (MBytes)":
         p1 = par2.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
  
     lines.append(p1)
