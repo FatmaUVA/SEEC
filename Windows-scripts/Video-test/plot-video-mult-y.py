@@ -15,10 +15,12 @@ def make_patch_spines_invisible(ax):
     for sp in ax.spines.values():
         sp.set_visible(False)
 
-plot_dir='/home/harlem1/SEEC/Windows-scripts/Video-test'
-res_dir="/home/harlem1/SEEC/Windows-scripts/Video-test/fps-logs"
+#plot_dir='/home/harlem1/SEEC/Windows-scripts/Video-test'
+#res_dir="/home/harlem1/SEEC/Windows-scripts/Video-test/fps-logs"
+plot_dir='/Users/fatmaalali/Documents/UVA/Scripts/SEEC/Windows-scripts/Video-test'
+res_dir="/Users/fatmaalali/Documents/UVA/Scripts/SEEC/Windows-scripts/Video-test/fps-logs"
 
-method=["VQ (slow-mo)","Total update size (MBytes)","Frame per second (fps)"]
+method=["slow-mo-VQ","Total update size (MBytes)","recv-PCoIP-fps"]
 
 colors = cm.rainbow(np.linspace(0, 7, 20))
 markers = ['^','s','o','*','x','D','+']
@@ -43,8 +45,8 @@ par2.spines["right"].set_visible(True)
 
 #set y-axes labels
 host.set_xlabel('Packet loss rate (%)',fontsize=14)
-host.set_ylabel("Frame per second (fps)",fontsize=14)
-par1.set_ylabel("VQ (slow-mo)",fontsize=14)
+host.set_ylabel("Received PCoIP fps (recv-PCoIP-fps)",fontsize=14)
+par1.set_ylabel("Video quality (slow-mo-VQ)",fontsize=14)
 par2.set_ylabel("Total update size (MBytes)",fontsize=14)
 
 host.set_ylim(1,25) #for FPS
@@ -86,9 +88,9 @@ for file_name in ff:
     print pesq_mean
     print pesq_error
 
-    if method[index] == "Frame per second (fps)":
+    if method[index] == "recv-PCoIP-fps":
         p1 = host.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
-    elif method[index] == "VQ (slow-mo)":
+    elif method[index] == "slow-mo-VQ":
         p1 = par1.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
     elif method[index] == "Total update size (MBytes)":
         p1 = par2.errorbar(loss_uniq,pesq_mean,yerr=pesq_error,color=colors[index],marker=markers[index],linewidth=2.0,markersize=10,label=method[index])
@@ -96,7 +98,7 @@ for file_name in ff:
     lines.append(p1)
     index = index + 1
 
-plot_name='video-vq-fps-bytes-total-runs-'+str(total_runs)+'.pdf'
-host.legend(lines, [l.get_label() for l in lines], loc="upper left")
+plot_name='new-metric-name-video-vq-fps-bytes-total-runs-'+str(total_runs)+'.pdf'
+host.legend(lines, [l.get_label() for l in lines], loc="upper right")
 plt.savefig(plot_dir + '/' +plot_name,format="pdf",bbox_inches='tight')
 #plt.show()
