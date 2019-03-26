@@ -1,5 +1,6 @@
-#plot mean DUT and bytes
-#x-axis is the loss rate, left y-axis DUT, right y-axis bytes
+#plot mean DUT breakout and bytes (VD-DUT, RT_Marker, RT_autoit, transmission time, retransmission time)
+#x-axis is the loss rate, left y-axis RT, right y-axis bytes
+#This script was used to generate the ImgeViewing plot in the paper 
 
 import sys, os
 import numpy as np
@@ -16,12 +17,9 @@ def Read_data(run_no,meth):
     #two arrays RT and Bytes. each array has all the runs 
     
     file_name = app + "_RT_"+meth+"_run_"+str(run_no)
-#    if meth !="autoit":
-#        file_name = app + "_RT_"+meth+"_run_"+str(run_no)+"-10"
     print("file name " ,file_name)
     #read data, all the colunm
     data_meth = "data-" + meth
-    #globals()[data_meth] = np.loadtxt(res_dir +'/' + file_name, delimiter=' ') #,unpack=True)
     globals()[data_meth] = np.genfromtxt(res_dir +'/' + file_name, delimiter=' ')
     
     no_tasks = ((globals()[data_meth][0].size - 2)/2) #find how many images are there in each run, -2 to remove the rtt and loss values
@@ -47,7 +45,7 @@ def Read_data(run_no,meth):
         globals()[by_meth] = globals()[by_meth] /10e6 # change it to MB
         return globals()[rt_meth], globals()[by_meth], rtt, loss, loss_uniq
 
-    #if autoit, hten donnot return by_meth cause there are none
+    #if autoit, then do not return by_meth cause there are none
     return globals()[rt_meth], rtt, loss, loss_uniq
 
 def Compute_t(rt_meth, by_meth,rt_autoit, rt_marker,rtt, loss, loss_uniq):
@@ -70,12 +68,10 @@ def Compute_t(rt_meth, by_meth,rt_autoit, rt_marker,rtt, loss, loss_uniq):
         globals()[temp2] = []
 
 
-
         #add indices to the list, one list for each loss value
         for i in range(len(globals()[temp1])):
             globals()[temp2].append(globals()[temp1][i])
 
-    
     #add elemnts to the array based on the found indecies
     for meth in method:
         rt_meth = "rt_"+meth
@@ -94,7 +90,7 @@ def Compute_t(rt_meth, by_meth,rt_autoit, rt_marker,rtt, loss, loss_uniq):
 
     method = ["display_updates_2"]
 
-    #find time diff which is DUT-autoit time
+    #find time diff which is DUT - (autoit+transmission_time_rt_trans)
     for meth in method:
         for l in loss_uniq:
             rt_DUT_loss = "rt_"+meth+"_loss_" + str(l)
@@ -122,6 +118,7 @@ def Compute_t(rt_meth, by_meth,rt_autoit, rt_marker,rtt, loss, loss_uniq):
             globals()[rt_autoit_loss] = np.delete(globals()[rt_autoit_loss], ind[0],axis=0)
 
             globals()[rt_trans_loss] = globals()[by_DUT_loss]*8 / 1e3 #bytes are in MBytes, and link rate is 1Gbps
+            globals()[rt_diff_loss] = globals()[rt_DUT_loss] -  (globals()[rt_autoit_loss] + globals()[rt_trans_loss])  #I added this new
             globals()[rt_proc_retrans] = globals()[rt_diff_loss] - globals()[rt_trans_loss]
             
 
@@ -191,8 +188,10 @@ App = ["ImageView" ] #,"Web360"] #"ImageView"
 method=["autoit","display_updates_2","marker_packets_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
 Run_no = ["1-Pics14-model4"] #, "3-model3"] #"3-model4" #"1-Pics14-model4"
 
-res_dir="/home/harlem1/SEEC/Windows-scripts/results"
-plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots/'
+#res_dir="/home/harlem1/SEEC/Windows-scripts/results"
+#plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots/'
+res_dir="/Users/fatmaalali/Downloads/SEEC-latest-from-VM/Windows-scripts/results"
+plot_dir='/Users/fatmaalali/Downloads/SEEC-latest-from-VM/Windows-scripts/plots/2018-12-plots/'
 
 app = App[0]
 i=0
@@ -222,12 +221,12 @@ for meth in method:
 #===============plot===============
 
 #plot RT and Bytes seperatly
-plot_name='/'+App[0]+'-DUT-and-bytes-'+str(Run_no[0])+'.png'
+plot_name='/'+App[0]+'-VD-DUT-and-bytes-'+str(Run_no[0])+'.pdf'
 
 colors = cm.rainbow(np.linspace(0, 7, 40))
 markers = ['^','s','o','*','x','D','+']
 fig, ax1 = plt.subplots(1)
-ax1.set_xlabel('packet loss rate (%)',fontsize=14)
+ax1.set_xlabel('Packet loss rate (%)',fontsize=14)
 ax1.set_ylabel('Time (sec)')
 #ax1.set_ylim(5,7)
 
@@ -236,17 +235,16 @@ for app in App:
     #rt,by,rt_error,by_error = 
     #rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,by,by_error = Compute_t(rt_DUT, by_DUT,rt_autoit, rtt, loss,loss_uniq)
     rt_proc, rt_proc_error,rt_trans, rt_trans_error,rt_diff, rt_diff_error,rt_DUT, rt_DUT_error, rt_autoit, rt_autoit_error,rt_marker, rt_marker_error, by,by_error = Compute_t(rt_DUT, by_DUT,rt_autoit,rt_marker, rtt, loss,loss_uniq)
-    ax1.errorbar(loss_uniq,rt_proc,color=colors[i],yerr=rt_proc_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'T=DUT-(t_trans+t_autoit)')
+    #ax1.errorbar(loss_uniq,rt_proc,color=colors[i],yerr=rt_proc_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'T=DUT-(t_trans+t_autoit)')
+    ax1.errorbar(loss_uniq,rt_DUT,color=colors[i],yerr=rt_DUT_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'VD-DUT')
     i+=1
-    ax1.errorbar(loss_uniq,rt_trans,color=colors[i],yerr=rt_trans_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_trans')
+    ax1.errorbar(loss_uniq,rt_autoit,color=colors[i],yerr=rt_autoit_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'RT-Autoit')
     i+=1
-    ax1.errorbar(loss_uniq,rt_diff,color=colors[i],yerr=rt_diff_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_n=DUT - t_autoit')
+    ax1.errorbar(loss_uniq,rt_marker,color=colors[i],yerr=rt_marker_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'RT-Marker')
     i+=1
-    ax1.errorbar(loss_uniq,rt_DUT,color=colors[i],yerr=rt_DUT_error,marker=markers[i],linewidth=2.0,markersize=10,label = 'DUT')
+    ax1.errorbar(loss_uniq,rt_trans,color=colors[i],yerr=rt_trans_error,marker=markers[i],linewidth=2.0,markersize=10,label = r'$T_{trans}$')
     i+=1
-    ax1.errorbar(loss_uniq,rt_autoit,color=colors[i],yerr=rt_autoit_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_autoit')
-    i+=1
-    ax1.errorbar(loss_uniq,rt_marker,color=colors[i],yerr=rt_marker_error,marker=markers[i],linewidth=2.0,markersize=10,label = 't_marker')
+    ax1.errorbar(loss_uniq,rt_diff,color=colors[i],yerr=rt_diff_error,marker=markers[i],linewidth=2.0,markersize=10,label = r'$T_{retrans}=$VD-DUT$-(T_{trans}+$RT-Autoit$)$')
 
 #create anothor axis for number of bytes
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -254,10 +252,10 @@ ax2.set_ylabel('Display Update Size (MBytes)')  # we already handled the x-label
 ax2.set_ylim(0,0.3)
 i = 0
 for app in App:
-    ax2.errorbar(loss_uniq,by,color=colors[i],yerr=by_error,marker=markers[i],linewidth=2.0,markersize=10,linestyle='dashed',label = app+' MB')
+    ax2.errorbar(loss_uniq,by,color=colors[i],yerr=by_error,marker=markers[i],linewidth=1.5,markersize=7,linestyle='dashed',label = 'Display update size (MBytes)')
     i+=1
 
-ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.2,1.18))
-ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.2,-0.1))
-plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
+ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.08,1.18))
+ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(0.28,-0.17))
+plt.savefig(plot_dir + '/' +plot_name,format="pdf",bbox_inches='tight')
 plt.show()

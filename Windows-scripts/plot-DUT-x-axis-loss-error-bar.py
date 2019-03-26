@@ -138,25 +138,27 @@ App = ["ImageView" ,"Web360"] #"ImageView"
 method=["display_updates_2"] #["autoit","display_updates","display_updates_2"] #"RT_marker_packets_2"
 Run_no = ["1-Pics14-model4", "6-model4"] #"3-model4" #"1-Pics14-model4"
 legend_title = ["Image viewing", "360-degree image exploring"]
-res_dir="/home/harlem1/SEEC/Windows-scripts/results"
-plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots'
+#res_dir="/home/harlem1/SEEC/Windows-scripts/results"
+#plot_dir='/home/harlem1/SEEC/Windows-scripts/plots/2018-12-plots'
+res_dir="/Users/fatmaalali/Downloads/SEEC-latest-from-VM/Windows-scripts/results"
+plot_dir='/Users/fatmaalali/Downloads/SEEC-latest-from-VM/Windows-scripts/plots/2018-12-plots/'
 
 #===============plot===============
 
 #plot RT and Bytes seperatly
-plot_name='/DUT-and-bytes-'+App[0]+'-and-'+App[1]+'.png'
+plot_name='/VD-DUT-and-bytes-'+App[0]+'-and-'+App[1]+'.pdf'
 
 colors = cm.rainbow(np.linspace(0, 7, 20))
 markers = ['^','s','o','*','x','D','+']
 fig, ax1 = plt.subplots(1)
-ax1.set_xlabel('packet loss rate (%)',fontsize=14)
-ax1.set_ylabel('DUT (sec)')
+ax1.set_xlabel('Packet loss rate (%)',fontsize=14)
+ax1.set_ylabel('VD-DUT (sec)')
 #ax1.set_ylim(5,7)
 
 i = 0
 for app in App:
     rt,by,rt_error,by_error = Compute(Run_no[i])
-    ax1.errorbar(loss_uniq,rt,color=colors[i],yerr=rt_error,marker=markers[i],linewidth=2.0,markersize=10,label = legend_title[i]+' DUT')
+    ax1.errorbar(loss_uniq,rt,color=colors[i],yerr=rt_error,marker=markers[i],linewidth=2.0,markersize=10,label = legend_title[i]+' VD-DUT')
     i+=1
 
 
@@ -170,7 +172,7 @@ for app in App:
     ax2.errorbar(loss_uniq,by,color=colors[i],yerr=by_error,marker=markers[i],linewidth=2.0,markersize=10,linestyle='dashed',label = legend_title[i]+' MB')
     i+=1
 
-ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.1,1.18))
-ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.1,-0.1))
-plt.savefig(plot_dir + '/' +plot_name,format="png",bbox_inches='tight')
-plt.show()
+ax1.legend(loc='upper left',ncol=3,bbox_to_anchor=(-0.07,1.18))
+ax2.legend(loc='upper left',ncol=3,bbox_to_anchor=(0,-0.17))
+plt.savefig(plot_dir + '/' +plot_name,format="pdf",bbox_inches='tight')
+#plt.show()
