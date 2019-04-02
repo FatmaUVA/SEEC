@@ -85,6 +85,7 @@ for file_name in ff:
     pesq_std = np.asarray(pesq_std) #change it to np array to allow array operations
     pesq_error = z*(pesq_std / math.sqrt(total_runs))
 
+    print method[index]
     print pesq_mean
     print pesq_error
 
@@ -100,5 +101,5 @@ for file_name in ff:
 
 plot_name='new-metric-name-video-vq-fps-bytes-total-runs-'+str(total_runs)+'.pdf'
 host.legend(lines, [l.get_label() for l in lines], loc="upper right")
-plt.savefig(plot_dir + '/' +plot_name,format="pdf",bbox_inches='tight')
-#plt.show()
+#plt.savefig(plot_dir + '/' +plot_name,format="pdf",bbox_inches='tight')
+plt.show()
